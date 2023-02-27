@@ -3,30 +3,36 @@
     <el-header>
       <navbar/>
     </el-header>
-    <el-main >
+    <el-main style="overflow: hidden">
       <el-row :gutter="20">
         <el-col :span="12">
           <el-tabs type="border-card" >
-            <el-tab-pane label="题目描述" class="test" >
-              <div style="margin-bottom: 20px">1.两束之后</div>
-              <el-space wrap>
-                <el-tag>数字</el-tag>
-                <el-tag>标签</el-tag>
-                <el-tag>数字</el-tag>
-                <el-tag>数字</el-tag>
-              </el-space>
-              <el-divider/>
-              <div style="height: 900px">123</div>
-              <el-collapse v-model="activeHint" accordion>
-                <el-collapse-item :title="'提示'+item.id" :name="item.id" v-for="item in hintList">
-                  {{item.description}}
-                </el-collapse-item>
-              </el-collapse>
+            <el-tab-pane label="题目描述" style="height: calc(100vh - 231px)">
+              <el-scrollbar>
+                <div style="margin-bottom: 20px">1.两束之后</div>
+                <el-space wrap>
+                  <el-tag>数字</el-tag>
+                  <el-tag>标签</el-tag>
+                  <el-tag>数字</el-tag>
+                  <el-tag>数字</el-tag>
+                </el-space>
+                <el-divider/>
+                <div style="height: 900px">123</div>
+                <el-collapse v-model="activeHint" accordion>
+                  <el-collapse-item :title="'提示'+item.id" :name="item.id" v-for="item in hintList">
+                    {{item.description}}
+                  </el-collapse-item>
+                </el-collapse>
+              </el-scrollbar>
+
             </el-tab-pane>
-            <el-tab-pane label="题解">
-              <solution/>
+            <el-tab-pane label="题解" style="height: calc(100vh - 231px)">
+              <el-scrollbar>
+                <solution/>
+              </el-scrollbar>
             </el-tab-pane>
-            <el-tab-pane label="提交记录">
+            <el-tab-pane label="提交记录" style="height: calc(100vh - 231px)">
+              <el-scrollbar>
               <el-table :data="answerRecords">
                 <el-table-column prop="createTime" label="提交时间"/>
                 <el-table-column prop="language" label="语言"/>
@@ -38,6 +44,7 @@
                   </template>
                 </el-table-column>
               </el-table>
+              </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
         </el-col>
@@ -100,7 +107,7 @@ export default {
   },
   data() {
     return {
-      codeEditVisible: false,
+      codeEditVisible: true,
       height: document.documentElement.clientHeight - 180 + 'px',
       languageId: null,
       languageList: [
@@ -152,6 +159,8 @@ export default {
 .container {
   /*overflow: hidden;*/
   height: 100%;
+  width: 100%;
+  /*position: fixed;*/
 }
 .vcenter {
   display: flex;
@@ -159,20 +168,10 @@ export default {
   flex-direction: column;
   justify-content: center;
 }
-.test {
-  flex-direction: column;
-  background-color: rgb(246, 248, 250);
-  /*-webkit-box-flex: 1;*/
-  /*flex-grow: 1;*/
-  overflow-y: auto;
-  position: relative;
-  padding: 4px 8px;
-  display: flex;
-}
 
 .scroll {
-  overflow: scroll;
-  /*height: 100%;*/
+  /*overflow: scroll;*/
+  height: 100%
 }
 
 .left {
