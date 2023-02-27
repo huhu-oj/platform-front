@@ -1,21 +1,16 @@
 <template>
   <el-container>
     <el-header>
-      <el-menu
-          mode="horizontal"
-          :ellipsis="false"
-      >
-        <div class="flex-grow1"/>
-        <el-menu-item>LOGO</el-menu-item>
-        <div class="flex-grow6"/>
-        <el-menu-item>Processing Center</el-menu-item>
-        <el-sub-menu>
-          <template #title>123</template>
-        </el-sub-menu>
-        <div class="flex-grow1"/>
-      </el-menu>
+      <navbar>
+        <template #left>
+          <div style="display: flex;flex-grow: 1"></div>
+        </template>
+        <template #right>
+          <div style="display: flex;flex-grow: 1"></div>
+        </template>
+      </navbar>
     </el-header>
-    <el-row justify="center">
+    <el-row justify="center" style="margin-top: 20px">
       <el-col :span="18">
         <el-container>
           <el-aside width="20%">
@@ -25,44 +20,27 @@
               <div>无糖学霸</div>
             </div>
             <el-divider/>
-            <el-menu>
-              <el-menu-item>
-                <el-icon>
-                  <icon-menu/>
-                </el-icon>
-                <span>Navigator Two</span>
-              </el-menu-item>
-              <el-divider/>
-              <el-menu-item>
-                <el-icon>
-                  <document/>
-                </el-icon>
-                <span>Navigator Three</span>
-              </el-menu-item>
-              <el-menu-item>
-                <el-icon>
-                  <setting/>
-                </el-icon>
-                <span>Navigator Four</span>
-              </el-menu-item>
-            </el-menu>
+            <user-menu/>
           </el-aside>
           <el-main>
-<!--            <div style="height: 900px"></div>-->
+            <router-view/>
           </el-main>
         </el-container>
-
       </el-col>
 
     </el-row>
-    <el-footer>Footer</el-footer>
+    <el-footer class="user-footer">Footer</el-footer>
   </el-container>
 </template>
 
 <script>
-
+import userMenu from "@/components/UserMenu/index.vue";
+import navbar from "@/components/navbar/index.vue";
 export default {
   name: 'HomeView',
+  components: {
+    navbar,userMenu
+  }
 }
 </script>
 <style>
@@ -74,7 +52,9 @@ export default {
   align-items: center; /*由于flex-direction: column，因此align-items代表的是水平方向*/
   justify-content: center; /*由于flex-direction: column，因此justify-content代表的是垂直方向*/
 }
-
+.user-footer {
+  text-align: center;
+}
 .flex-grow1 {
   flex-grow: 1;
 }
