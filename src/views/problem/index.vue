@@ -63,7 +63,12 @@
             <el-button>全屏</el-button>
           </div>
           <div style="display: flex">
-            <code-edit :value="code" :height="height" style="width: 100%"></code-edit>
+            <code-edit
+                :value="code"
+                :height="height"
+                language="javascript"
+                @changed="(value)=>this.code = value"
+            />
           </div>
         </el-col>
         <el-col v-else :span="12">
@@ -108,7 +113,7 @@ export default {
   data() {
     return {
       codeEditVisible: true,
-      height: document.documentElement.clientHeight - 180 + 'px',
+      height: document.documentElement.clientHeight - 180,
       languageId: null,
       languageList: [
         {id:1,name: 'python'},
