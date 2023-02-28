@@ -3,21 +3,18 @@
 <!--    <textarea ref="textarea" />-->
 <!--  </div>-->
   <MonacoEditor
+      theme="vs-dark"
+      :options="options"
+      :value="value"
       :height="height"
-      class="vs"
-      style="text-align: left;background-color: #fff"
-      :language="language"
-      :code="value"
-      :editorOptions="options"
+      :lang="language"
       @mounted="onMounted"
       @codeChange="onCodeChange"
   />
 </template>
 
 <script>
-// import CodeMirror from 'codemirror'
-// import './settings'
-import MonacoEditor from 'vue-monaco-editor'
+import MonacoEditor from 'monaco-editor-vue3'
 export default {
   components: {
     MonacoEditor
@@ -40,7 +37,6 @@ export default {
     return {
       editor: false,
       options: {
-        theme: "vs",
         selectOnLineNumbers: true,
         roundedSelection: false,
         readOnly: false,
@@ -50,41 +46,19 @@ export default {
         formatOnPaste: true,
         formatOnType: true,
         folding: true,
+        wordWrap: "wordWrapColumn",
+        inherit: true,
+        // wordWrapColumn: 40,
+
+        // Set this to false to not auto word wrap minified files
+        wordWrapMinified: true,
+
+        // try "same", "indent" or "none"
+        wrappingIndent: "same",
       }
     }
   },
-  watch: {
-    // value(value) {
-    //   const editorValue = this.editor.getValue()
-    //   if (value !== editorValue) {
-    //     this.editor.setValue(this.value)
-    //   }
-    // },
-    height(value) {
-      this.editor.setSize('auto', this.height)
-    }
-  },
   mounted() {
-    // this.editor = CodeMirror.fromTextArea(this.$refs.textarea, {
-    //   mode: `text/x-${this.language}`,
-    //   lineNumbers: true,
-    //   lint: true,
-    //   lineWrapping: true,
-    //   tabSize: 2,
-    //   cursorHeight: 0.9,
-    //   // 替换主题这里需修改名称
-    //   theme: 'idea',
-    //   highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-    //   matchBrackets: true,
-    //   autoCloseBrackets: true // 自动补全括号
-    //   // readOnly: false
-    // })
-    // this.editor.setSize('auto', this.height)
-    // this.editor.setValue(this.value)
-    // this.editor.on('change', cm => {
-    //   this.$emit('changed', cm.getValue())
-    //   this.$emit('input', cm.getValue())
-    // })
   },
   methods: {
     getValue() {
@@ -92,6 +66,7 @@ export default {
     },
     onMounted (editor) {
       this.editor = editor;
+      console.log(editor)
     },
     onCodeChange(editor) {
       // console.log(editor)

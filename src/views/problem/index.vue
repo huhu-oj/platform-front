@@ -66,7 +66,7 @@
             <code-edit
                 :value="code"
                 :height="height"
-                language="javascript"
+                language="java"
                 @changed="(value)=>this.code = value"
             />
           </div>
@@ -102,7 +102,6 @@
 </template>
 <script>
 import codeEdit from "@/components/CodeEdit/index.vue";
-import 'codemirror/mode/clike/clike'
 import navbar from "@/components/navbar/index.vue";
 import solution from "@/views/solution/index.vue";
 import solutionDetail from "@/views/solution/SolutionDetail.vue";
@@ -120,7 +119,21 @@ export default {
         {id:2,name: 'java'},
         {id:3,name: 'go'},
       ],
-      code: `123`,
+      code: `package love.huhu.platform;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PlatformServerApplication {
+
+
+    public static void main(String[] args) {
+        SpringApplication.run(PlatformServerApplication.class, args);
+    }
+
+}
+`,
       hintList: [
         {id:1,description: '123'},
         {id:2,description: '1234'},
