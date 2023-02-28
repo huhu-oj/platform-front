@@ -63,12 +63,7 @@
             <el-button>全屏</el-button>
           </div>
           <div style="display: flex">
-            <code-edit
-                :value="code"
-                :height="height"
-                language="java"
-                @changed="(value)=>this.code = value"
-            />
+            <codemirror v-model:value="code" :options="options"/>
           </div>
         </el-col>
         <el-col v-else :span="12">
@@ -101,16 +96,38 @@
   </el-container>
 </template>
 <script>
-import codeEdit from "@/components/CodeEdit/index.vue";
 import navbar from "@/components/navbar/index.vue";
 import solution from "@/views/solution/index.vue";
 import solutionDetail from "@/views/solution/SolutionDetail.vue";
+import Codemirror from 'codemirror-editor-vue3';
+// 编辑器代码格式
+import 'codemirror/mode/javascript/javascript.js';
+// 自动刷新
+import 'codemirror/addon/display/autorefresh';
+// 主题
+import 'codemirror/theme/dracula.css';
 export default {
   components: {
-    codeEdit,navbar,solution,solutionDetail
+    navbar,solution,solutionDetail,Codemirror
   },
   data() {
     return {
+      options: {
+        autorefresh: true,
+        smartIndent: true,
+        tabSize: 4,
+        mode: 'application/json',
+        theme: 'dracula',
+        line: true,
+        viewportMargin: Infinity,
+        highlightDifferences: true,
+        autofocus: false,
+        indentUnit: 2,
+        readOnly: false, // 只读
+        showCursorWhenSelecting: true,
+        firstLineNumber: 1,
+        matchBrackets: true,//括号匹配
+      },
       codeEditVisible: true,
       height: document.documentElement.clientHeight - 180,
       languageId: null,

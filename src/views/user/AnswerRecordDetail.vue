@@ -49,7 +49,6 @@
           </div>
         </div>
         <div>
-          <code-edit :value="code"/>
         </div>
         <div style="text-align: center">返回</div>
       </el-col>
@@ -59,11 +58,10 @@
 
 <script>
 import navbar from "@/components/navbar/index.vue";
-import codeEdit from "@/components/CodeEdit/index.vue";
 export default {
   name: "ProblemDetail",
   components: {
-    navbar,codeEdit
+    navbar
   },
   data() {
     return {
