@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import {get as getSolutions} from '@/api/solution'
 export default {
   data() {
     return {
@@ -41,6 +42,13 @@ export default {
           }
         },
       ]
+    }
+  },
+  methods: {
+    getSolutions() {
+      getSolutions(this.problem.id).then(data=>{
+        this.solutions = data
+      })
     }
   }
 }

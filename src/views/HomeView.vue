@@ -40,6 +40,11 @@ export default {
   name: 'HomeView',
   components: {
     navbar,userMenu
+  },
+  methods: {
+    getUser() {
+
+    }
   }
 }
 </script>

@@ -58,6 +58,7 @@
 
 <script>
 import navbar from "@/components/navbar/index.vue";
+import {get as getAnswerRecord} from '@/api/answerRecord'
 export default {
   name: "ProblemDetail",
   components: {
@@ -70,6 +71,13 @@ export default {
         //return null;
     }
 }`
+    }
+  },
+  methods: {
+    getAnswerRecord() {
+      getAnswerRecord(this.answerRecord.id).then(data=>{
+        this.answerRecord = data
+      })
     }
   }
 }

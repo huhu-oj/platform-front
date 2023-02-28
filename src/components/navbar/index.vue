@@ -29,6 +29,11 @@ import userMenu from "@/components/UserMenu/index.vue";
 export default {
   components: {
     userMenu
+  },
+  methods: {
+    getUserInfo() {
+
+    }
   }
 }
 </script>

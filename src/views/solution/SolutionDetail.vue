@@ -10,8 +10,21 @@
 </template>
 
 <script>
+import {get as getSolution} from '@/api/solution'
 export default {
-  name: "SolutionDetail"
+  name: "SolutionDetail",
+  data() {
+    return {
+      solution: {},
+    }
+  },
+  methods: {
+    getSolution() {
+      getSolution(this.solution.id).then(data=>{
+        this.solution = data
+      })
+    }
+  }
 }
 </script>
 

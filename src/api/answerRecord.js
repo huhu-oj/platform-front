@@ -1,10 +1,10 @@
 import request from '@/utils/request'
 
-export function get(problemId) {
+export function get(problemId,answerRecordId) {
     return request({
         url: '/api/answerRecord',
         method: 'get',
-        params: problemId
+        params: problemId,answerRecordId
     })
 }
 export function getForTeacher(problemId,studentId) {

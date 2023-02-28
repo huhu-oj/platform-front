@@ -11,7 +11,7 @@
           </el-select>
           <el-input ></el-input>
         </div>
-        <el-table :data="data">
+        <el-table :data="answerRecords">
           <el-table-column prop="id" label="编号"/>
           <el-table-column prop="problem.name" label="所属题目"/>
           <el-table-column prop="submitCount" type="expand">
@@ -42,16 +42,15 @@
 <script>
 import * as echarts from 'echarts';
 import { debounce } from '@/utils'
+import {get as getExecuteResultList} from '@/api/executeResult'
+import {get as getAnswerRecords} from '@/api/answerRecord'
 export default {
   name: "AnswerRecord",
   data() {
     return {
       executeResultId: null,
-      executeResultList: [
-        {id: 1,name:'通过'},
-        {id: 2,name:'未通过'},
-      ],
-      data: [
+      executeResultList: [],
+      answerRecords: [
         {
           id: 1,
           problem: {name:'两数之后'},
@@ -111,6 +110,18 @@ export default {
       chart: null
     }
   },
+  methods: {
+    getExecuteResultList() {
+      getExecuteResultList().then(data=>{
+        this.executeResultList = data
+      })
+    },
+    getAnswerRecords() {
+      getAnswerRecords().then(data=>{
+        this.executeResultList = data
+      })
+    }
+  },
   mounted() {
     this.chart = echarts.init(this.$refs.answerRecordStatChart)
     this.chart.setOption(this.answerRecordStat)
@@ -119,6 +130,9 @@ export default {
         this.chart.resize()
       }
     }, 100))
+  },
+  created() {
+    this.getExecuteResultList()
   }
 }
 </script>

@@ -106,6 +106,14 @@ import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/addon/display/autorefresh';
 // 主题
 import 'codemirror/theme/dracula.css';
+
+import {get as getLanguageList} from '@/api/language'
+import {get as getHints} from '@/api/hint'
+import {get as getSolutions} from '@/api/solution'
+import {get as getProblem} from '@/api/problem'
+import {get as getAnswerRecords} from '@/api/answerRecord'
+import {judge, test} from "@/api/judge";
+
 export default {
   components: {
     navbar,solution,solutionDetail,Codemirror
@@ -186,6 +194,43 @@ public class PlatformServerApplication {
           note: '123'
         },
       ]
+    }
+  },
+  methods: {
+    judge() {
+      judge(this.answerRecordToJudge).then(data=>{
+
+      })
+    },
+    test() {
+      test(this.answerRecordToJudge).then(data=>{
+
+      })
+    },
+    getHints() {
+      getHints(this.problem.id).then(data=>{
+        this.hints = data
+      })
+    },
+    getProblem() {
+      getProblem(this.problem.id).then(data=>{
+        this.problem = data
+      })
+    },
+    getLanguageList() {
+      getLanguageList().then(data=>{
+        this.languageList = data
+      })
+    },
+    getSolutions() {
+      getSolutions(this.problem.id).then(data=>{
+        this.solutions = data
+      })
+    },
+    getAnswerRecords() {
+      getAnswerRecords().then(data=>{
+        this.answerRecords = data
+      })
     }
   }
 }
