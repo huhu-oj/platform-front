@@ -1,21 +1,24 @@
 <template>
-  <div style="margin-bottom: 20px">1.两束之后</div>
+  <div style="margin-bottom: 20px">{{ solution.problem.title }}</div>
   <el-space wrap>
-    <el-tag>数字</el-tag>
-    <el-tag>标签</el-tag>
-    <el-tag>数字</el-tag>
-    <el-tag>数字</el-tag>
+    <el-tag v-for="item in solution.labels">{{item.name}}</el-tag>
   </el-space>
   <el-divider/>
+  <div v-html="solution.descriptionHtml"></div>
 </template>
 
 <script>
 import {get as getSolution} from '@/api/solution'
 export default {
   name: "SolutionDetail",
+  props: {
+    solution: {
+      required:true,
+      type: Object,
+    }
+  },
   data() {
     return {
-      solution: {},
     }
   },
   methods: {

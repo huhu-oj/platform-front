@@ -1,8 +1,12 @@
 <template>
-  <el-card shadow="never" v-for="item in solutions">
-    <el-avatar :src="'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'"></el-avatar>
-    <span>{{item.title}}</span>
-  </el-card>
+  <div v-if="solutions.length !== 0">
+    <el-card shadow="never" v-for="item in solutions" @click="$emit('showDetail',item)">
+      <el-avatar :src="'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'"></el-avatar>
+      <span>{{item.title}}</span>
+    </el-card>
+  </div>
+
+  <div v-else style="height: 200px;display: flex;flex-direction: column;justify-content: center;align-items: center">暂无题解</div>
 </template>
 
 <script>
@@ -14,6 +18,7 @@ export default {
       required: true
     }
   },
+  emits: ['showDetail'],
   data() {
     return {
       solutions: [
@@ -50,15 +55,21 @@ export default {
       ]
     }
   },
+  watch: {
+    //正确给 cData 赋值的 方法
+    problemId(newVal,oldVal){
+      newVal && this.getSolutions(); //newVal存在的话执行dataChild函数
+    }
+  },
   methods: {
     getSolutions() {
       getSolutions(this.problemId).then(data=>{
         this.solutions = data.content
       })
-    }
+    },
+
   },
   mounted() {
-    this.getSolutions()
   }
 }
 </script>

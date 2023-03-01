@@ -6,7 +6,7 @@
     <el-main style="overflow: hidden">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-tabs type="border-card" @tab-change="syncData">
+          <el-tabs type="border-card">
             <el-tab-pane label="题目描述" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <div style="margin-bottom: 20px">{{ problem.title }}</div>
@@ -14,7 +14,7 @@
                   <el-tag v-for="item in problem.labels">{{item.name}}</el-tag>
                 </el-space>
                 <el-divider/>
-                <div v-html="problem.description"></div>
+                <div v-html="problem.descriptionHtml"></div>
                 <el-collapse v-model="activeHint" accordion>
                   <el-collapse-item :title="'提示'+item.id" :name="item.id" v-for="item in problem.hints">
                     {{item.description}}
@@ -25,14 +25,14 @@
             </el-tab-pane>
             <el-tab-pane label="题解" style="height: calc(100vh - 231px)">
               <el-scrollbar>
-                <solution :problemId="problem.id"/>
+                <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
             </el-tab-pane>
             <el-tab-pane label="提交记录" style="height: calc(100vh - 231px)">
               <el-scrollbar>
               <el-table :data="answerRecords">
                 <el-table-column prop="createTime" label="提交时间"/>
-                <el-table-column prop="language" label="语言"/>
+                <el-table-column prop="language.name" label="语言"/>
                 <el-table-column prop="executeResult.name" label="提交结果"/>
                 <el-table-column prop="note" label="备注">
                   <template #default="scope">
@@ -64,8 +64,8 @@
           </div>
         </el-col>
         <el-col v-else :span="12">
-          <el-button>关闭</el-button>
-          <solution-detail/>
+          <el-button @click="codeEditVisible = true">关闭</el-button>
+          <solution-detail  :solution="solutionDetail"/>
         </el-col>
       </el-row>
     </el-main>
@@ -85,8 +85,8 @@
         <el-col :span="12" style="display: flex;padding: 0 10px">
           <el-button>控制台</el-button>
           <div style="display: flex;flex-grow: 1"></div>
-          <el-button>执行代码</el-button>
-          <el-button type="success">提交</el-button>
+          <el-button @click="testCode">执行代码</el-button>
+          <el-button type="success" @click="submitCode">提交</el-button>
         </el-col>
       </el-row>
     </el-footer>
@@ -110,6 +110,7 @@ import {get as getSolutions} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
 import {judge, test} from "@/api/judge";
+import {ElNotification} from "element-plus";
 
 export default {
   components: {
@@ -134,6 +135,7 @@ export default {
         firstLineNumber: 1,
         matchBrackets: true,//括号匹配
       },
+      solutionDetail: {},
       codeEditVisible: true,
       height: document.documentElement.clientHeight - 180,
       languageId: null,
@@ -155,35 +157,11 @@ public class PlatformServerApplication {
 }
 `,
       activeHint: 1,
-      answerRecords: [
-        {
-          id:1,
-          createTime: '123',
-          language: 'java',
-          executeResult: {
-            name: '通过'
-          },
-          note: '123'
-        },
-        {
-          id:1,
-          createTime: '123',
-          language: 'java',
-          executeResult: {
-            name: '通过'
-          },
-          note: null
-        },
-        {
-          id:1,
-          createTime: '123',
-          language: 'java',
-          executeResult: {
-            name: '通过'
-          },
-          note: '123'
-        },
-      ]
+      answerRecords: [],
+      codeConsole: {
+        visible: false,
+        testCase: '',
+      }
     }
   },
   methods: {
@@ -192,7 +170,7 @@ public class PlatformServerApplication {
 
       })
     },
-    test() {
+    judgeTest() {
       test(this.answerRecordToJudge).then(data=>{
 
       })
@@ -204,7 +182,6 @@ public class PlatformServerApplication {
     },
     getProblem() {
       getProblemById(this.id).then(data=>{
-        console.log(data)
         this.problem = data.content[0]
       })
     },
@@ -220,7 +197,7 @@ public class PlatformServerApplication {
     },
     getAnswerRecords() {
       getAnswerRecords(this.problem.id).then(data=>{
-        this.answerRecords = data
+        this.answerRecords = data.content
       })
     },
     getAnswerRecord() {
@@ -230,18 +207,27 @@ public class PlatformServerApplication {
         })
       }
     },
-    syncData(name) {
-      if (name === '题解') {
-        this.getSolutions()
-      } else if (name === '提交记录') {
-        this.getAnswerRecords()
+    showSolution(item) {
+      this.solutionDetail = item
+      this.codeEditVisible = false
+    },
+    testCode() {
+      if (this.codeConsole.testCase.length === 0) {
+        ElNotification.error({
+          title: '测试用例不能为空',
+          duration: 5000
+        })
+        this.codeConsole.visible = true
+        return
       }
+      this.judgeTest()
     }
   },
   mounted() {
     this.getProblem()
     this.getAnswerRecord()
     this.getLanguageList()
+    this.getAnswerRecords()
   }
 }
 </script>
