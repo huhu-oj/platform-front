@@ -13,3 +13,15 @@ export function getCode() {
         method: 'get'
     })
 }
+export function getInfo() {
+    return request({
+        url: '/api/user',
+        method: 'get',
+    })
+}
+export function logout() {
+    return request({
+        url: '/auth/logout',
+        method: 'get',
+    })
+}

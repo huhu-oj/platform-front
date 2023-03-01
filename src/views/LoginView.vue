@@ -15,7 +15,7 @@
                     placeholder="密码"></el-input>
           </el-form-item>
           <el-form-item prop="graphicCodeStr">
-            <el-input v-model="form.graphicCodeStr"
+            <el-input v-model="form.code"
                       placeholder="输入图形验证码">
               <template #suffix>
                 <el-image :src="photoSrc" data-original="photoSrc" @click="refreshCode"/>
@@ -46,6 +46,7 @@
 
 import {getCode, login} from "@/api/auth"
 import Cookies from 'js-cookie'
+import {ElNotification} from "element-plus";
 
 export default {
 
@@ -56,8 +57,8 @@ export default {
       form: {
         username: '',
         password: '',
-        graphicCodeStr: '',
-        graphicCodeId: '',
+        code: '',
+        uuid: '',
 
       },
       rules: {
@@ -80,25 +81,43 @@ export default {
       this.refreshCode();
     },
     login() {
-
       login(this.form).then(data=>{
-        //todo 登录后行为
+
         this.$router.push('/')
       }).catch(err=>{
-
+        this.$notify({
+          title: '错误',
+          message: '账号或密码错误',
+          type: 'error',
+          duration: 5000
+        })
+        this.refreshCode()
       })
     },
 
+    point() {
+      const point = Cookies.get('point') !== undefined
+      if (point) {
+        this.$notify({
+          title: '提示',
+          message: '当前登录状态已过期，请重新登录！',
+          type: 'warning',
+          duration: 5000
+        })
+        Cookies.remove('point')
+      }
+    },
     refreshCode() {
       getCode().then(res => {
         this.photoSrc = res.img
-        this.form.graphicCodeId = res.uuid
+        this.form.uuid = res.uuid
 
       })
     },
   },
   created() {
     this.refreshCode()
+    this.point()
   }
 
 }
