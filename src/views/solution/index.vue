@@ -8,6 +8,12 @@
 <script>
 import {get as getSolutions} from '@/api/solution'
 export default {
+  props: {
+    problemId: {
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
       solutions: [
@@ -46,10 +52,13 @@ export default {
   },
   methods: {
     getSolutions() {
-      getSolutions(this.problem.id).then(data=>{
-        this.solutions = data
+      getSolutions(this.problemId).then(data=>{
+        this.solutions = data.content
       })
     }
+  },
+  mounted() {
+    this.getSolutions()
   }
 }
 </script>

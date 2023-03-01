@@ -12,17 +12,17 @@
           <el-input ></el-input>
         </div>
         <el-table :data="answerRecords">
-          <el-table-column prop="id" label="编号"/>
-          <el-table-column prop="problem.name" label="所属题目"/>
+<!--          <el-table-column prop="id" label="编号"/>-->
+          <el-table-column prop="problem.title" label="所属题目"/>
           <el-table-column prop="submitCount" type="expand">
             <template #default="props">
-              <el-table :data="props.row.record">
+              <el-table :data="props.row.records">
                 <el-table-column prop="id" label="编号"/>
                 <el-table-column prop="createTime" label="创建时间"/>
-                <el-table-column prop="language" label="语言"/>
+                <el-table-column prop="language.name" label="语言"/>
                 <el-table-column label="操作">
                   <template #default="scope">
-                    <el-button type="text">查看详情</el-button>
+                    <el-button type="text" @click="$router.push(`/answer_record_detail/${scope.row.id}`)">查看详情</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -55,7 +55,7 @@ export default {
           id: 1,
           problem: {name:'两数之后'},
           submitCount: 4,
-          record: [
+          records: [
             {id:1,createTime:'123',language:'java'},
             {id:2,createTime:'123',language:'java'},
             {id:3,createTime:'123',language:'java'},
@@ -66,7 +66,7 @@ export default {
           id: 2,
           submitCount: 4,
           problem: {name:'数组求和'},
-          record: [
+          records: [
             {id:1,createTime:'123',language:'java'},
             {id:2,createTime:'123',language:'java'},
             {id:3,createTime:'123',language:'java'},
@@ -113,12 +113,24 @@ export default {
   methods: {
     getExecuteResultList() {
       getExecuteResultList().then(data=>{
-        this.executeResultList = data
+        this.executeResultList = data.content
       })
     },
     getAnswerRecords() {
       getAnswerRecords().then(data=>{
-        this.executeResultList = data
+        let content = data.content
+        console.log(content)
+        let result = []
+        let problems = new Set(content.map(ar=>ar.problem))
+        problems.forEach(problem=>{
+          let records = content.filter(ar=>ar.problem.id === problem.id)
+          result.push({
+            problem,
+            records
+          })
+        })
+
+        this.answerRecords = result
       })
     }
   },
@@ -132,7 +144,8 @@ export default {
     }, 100))
   },
   created() {
-    // this.getExecuteResultList()
+    this.getExecuteResultList()
+    this.getAnswerRecords()
   }
 }
 </script>

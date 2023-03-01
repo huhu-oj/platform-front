@@ -12,26 +12,26 @@
     </el-header>
     <el-row justify="center">
       <el-col :span="18">
-        <h3>题目</h3>
+        <h3>{{answerRecord.problem.title}}</h3>
         <h1>提交记录</h1>
         <div class="border">
           <div style="display: flex">
-            <div>0 / 57 个通过测试用例</div>
+            <div>{{answerRecord.passNum}} / {{ totalCase }} 个通过测试用例</div>
 
             <div style="flex-grow: 1"></div>
 
             <div>
               <div>状态:
-                <span>编译出错</span>
+                <span>{{ answerRecord.executeResult.name }}</span>
               </div>
               <div>提交时间:
-                <span>5 个月前</span>
+                <span>{{ answerRecord.createTime }}</span>
               </div>
             </div>
 
           </div>
-          <div class="border error">
-            <span>Line 4: error: missing return statement } ^</span>
+          <div class="border error" v-if="answerRecord.error">
+            <span>{{ answerRecord.error }}</span>
           </div>
         </div>
         <el-divider/>
@@ -39,16 +39,18 @@
           <div>
             <h2>提交的代码:</h2>
             <div>语言:
-              <span>java</span>
+              <span>{{ answerRecord.language.name }}</span>
             </div>
           </div>
           <div style="flex-grow: 1"></div>
           <div>
-            <span>备注：123</span>
-            <el-button type="success">编辑代码</el-button>
+            <span>{{ answerRecord.note }}</span>
+            <el-button type="success" @click="toProblem">编辑代码</el-button>
           </div>
         </div>
-        <div>
+        <div style="display: flex">
+          <codemirror v-model:value="answerRecord.code" :options="options"/>
+
         </div>
         <div style="text-align: center">返回</div>
       </el-col>
@@ -59,26 +61,60 @@
 <script>
 import navbar from "@/components/navbar/index.vue";
 import {get as getAnswerRecord} from '@/api/answerRecord'
+import Codemirror from 'codemirror-editor-vue3';
+// 编辑器代码格式
+import 'codemirror/mode/javascript/javascript.js';
+// 自动刷新
+import 'codemirror/addon/display/autorefresh';
 export default {
-  name: "ProblemDetail",
+  name: "AnswerRecordDetail",
   components: {
-    navbar
+    navbar,Codemirror
   },
+  computed: {
+    totalCase() {
+      return this.answerRecord.passNum+this.answerRecord.notPassNum
+    }
+  },
+  props: ['id'],
   data() {
     return {
-      code: `class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        //return null;
-    }
-}`
+      answerRecord: {
+        problem: {},
+        executeResult: {},
+        language: {}
+      },
+      options: {
+        autorefresh: true,
+        smartIndent: true,
+        tabSize: 4,
+        mode: 'application/json',
+        theme: 'dracula',
+        line: true,
+        viewportMargin: Infinity,
+        highlightDifferences: true,
+        autofocus: false,
+        indentUnit: 2,
+        readOnly: true, // 只读
+        showCursorWhenSelecting: true,
+        firstLineNumber: 1,
+        matchBrackets: true,//括号匹配
+      },
     }
   },
   methods: {
     getAnswerRecord() {
-      getAnswerRecord(this.answerRecord.id).then(data=>{
-        this.answerRecord = data
+      getAnswerRecord(null, this.id).then(data=>{
+        this.answerRecord = data.content[0]
+        console.log(this.answerRecord)
       })
+    },
+    toProblem() {
+      this.$router.push({path: `/problem/${this.answerRecord.problem.id}`,query: {answerRecordId: this.id}})
     }
+  },
+  mounted() {
+    this.getAnswerRecord()
   }
 }
 </script>

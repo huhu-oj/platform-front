@@ -4,7 +4,9 @@ export function get(problemId,answerRecordId) {
     return request({
         url: '/api/answerRecord',
         method: 'get',
-        params: problemId,answerRecordId
+        params: {
+            problemId,answerRecordId
+        }
     })
 }
 export function getForTeacher(problemId,studentId) {

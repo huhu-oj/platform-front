@@ -2,6 +2,8 @@ import axios from 'axios'
 import router from '@/router'
 import store from '../store'
 import { ElNotification } from 'element-plus'
+import { getToken } from '@/utils/auth'
+import Cookies from 'js-cookie'
 
 // 创建axios实例
 const service = axios.create({
@@ -11,6 +13,9 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(
   config => {
+    if (getToken()) {
+      config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    }
     config.headers['Content-Type'] = 'application/json'
     return config
   },
@@ -25,6 +30,7 @@ service.interceptors.response.use(
     return response.data
   },
   error => {
+    console.log(error)
     // 兼容blob下载出错json提示
     if (error.response.data instanceof Blob && error.response.data.type.toLowerCase().indexOf('json') !== -1) {
       const reader = new FileReader()
@@ -53,6 +59,7 @@ service.interceptors.response.use(
       if (code) {
         if (code === 401) {
           store.dispatch('LogOut').then(() => {
+            Cookies.set('point', 401)
             // 用户登录界面提示
             location.reload()
           })

@@ -4,12 +4,17 @@ import answerRecord from "@/views/user/AnswerRecord.vue";
 import myTest from "@/views/user/MyTest.vue";
 import problem from "@/views/problem"
 import answerRecordDetail from "@/views/user/AnswerRecordDetail.vue";
+import loginView from "@/views/LoginView.vue";
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView,
     children: [
+      {
+        path: '',
+        redirect: 'my-test'
+      },
       {
         path: 'answer',
         component: answerRecord
@@ -21,12 +26,18 @@ const routes = [
     ]
   },
   {
-    path: '/problem',
-    component: problem
+    path: '/problem/:id',
+    component: problem,
+    props: true
   },
   {
-    path: '/answer_record_detail',
-    component: answerRecordDetail
+    path: '/answer_record_detail/:id',
+    component: answerRecordDetail,
+    props: true
+  },
+  {
+    path: '/login',
+    component: loginView
   }
 ]
 

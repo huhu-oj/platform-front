@@ -6,20 +6,17 @@
     <el-main style="overflow: hidden">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-tabs type="border-card" >
+          <el-tabs type="border-card" @tab-change="syncData">
             <el-tab-pane label="题目描述" style="height: calc(100vh - 231px)">
               <el-scrollbar>
-                <div style="margin-bottom: 20px">1.两束之后</div>
+                <div style="margin-bottom: 20px">{{ problem.title }}</div>
                 <el-space wrap>
-                  <el-tag>数字</el-tag>
-                  <el-tag>标签</el-tag>
-                  <el-tag>数字</el-tag>
-                  <el-tag>数字</el-tag>
+                  <el-tag v-for="item in problem.labels">{{item.name}}</el-tag>
                 </el-space>
                 <el-divider/>
-                <div style="height: 900px">123</div>
+                <div v-html="problem.description"></div>
                 <el-collapse v-model="activeHint" accordion>
-                  <el-collapse-item :title="'提示'+item.id" :name="item.id" v-for="item in hintList">
+                  <el-collapse-item :title="'提示'+item.id" :name="item.id" v-for="item in problem.hints">
                     {{item.description}}
                   </el-collapse-item>
                 </el-collapse>
@@ -28,7 +25,7 @@
             </el-tab-pane>
             <el-tab-pane label="题解" style="height: calc(100vh - 231px)">
               <el-scrollbar>
-                <solution/>
+                <solution :problemId="problem.id"/>
               </el-scrollbar>
             </el-tab-pane>
             <el-tab-pane label="提交记录" style="height: calc(100vh - 231px)">
@@ -110,7 +107,7 @@ import 'codemirror/theme/dracula.css';
 import {get as getLanguageList} from '@/api/language'
 import {get as getHints} from '@/api/hint'
 import {get as getSolutions} from '@/api/solution'
-import {get as getProblem} from '@/api/problem'
+import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
 import {judge, test} from "@/api/judge";
 
@@ -118,6 +115,7 @@ export default {
   components: {
     navbar,solution,solutionDetail,Codemirror
   },
+  props: ['id'],
   data() {
     return {
       options: {
@@ -139,11 +137,8 @@ export default {
       codeEditVisible: true,
       height: document.documentElement.clientHeight - 180,
       languageId: null,
-      languageList: [
-        {id:1,name: 'python'},
-        {id:2,name: 'java'},
-        {id:3,name: 'go'},
-      ],
+      languageList: [],
+      problem: {},
       code: `package love.huhu.platform;
 
 import org.springframework.boot.SpringApplication;
@@ -159,11 +154,6 @@ public class PlatformServerApplication {
 
 }
 `,
-      hintList: [
-        {id:1,description: '123'},
-        {id:2,description: '1234'},
-        {id:3,description: '1235'},
-      ],
       activeHint: 1,
       answerRecords: [
         {
@@ -213,13 +203,14 @@ public class PlatformServerApplication {
       })
     },
     getProblem() {
-      getProblem(this.problem.id).then(data=>{
-        this.problem = data
+      getProblemById(this.id).then(data=>{
+        console.log(data)
+        this.problem = data.content[0]
       })
     },
     getLanguageList() {
       getLanguageList().then(data=>{
-        this.languageList = data
+        this.languageList = data.content
       })
     },
     getSolutions() {
@@ -228,10 +219,29 @@ public class PlatformServerApplication {
       })
     },
     getAnswerRecords() {
-      getAnswerRecords().then(data=>{
+      getAnswerRecords(this.problem.id).then(data=>{
         this.answerRecords = data
       })
+    },
+    getAnswerRecord() {
+      if (this.$route.query.answerRecordId) {
+        getAnswerRecords(this.$route.query.answerRecordId).then(data=>{
+          this.code = data.content[0].code
+        })
+      }
+    },
+    syncData(name) {
+      if (name === '题解') {
+        this.getSolutions()
+      } else if (name === '提交记录') {
+        this.getAnswerRecords()
+      }
     }
+  },
+  mounted() {
+    this.getProblem()
+    this.getAnswerRecord()
+    this.getLanguageList()
   }
 }
 </script>
