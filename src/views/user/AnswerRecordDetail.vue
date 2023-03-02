@@ -31,7 +31,8 @@
 
           </div>
           <div class="border error" v-if="answerRecord.error">
-            <span>{{ answerRecord.error }}</span>
+            <el-input type="textarea" :rows="6" readonly resize="none" v-model="answerRecord.error"></el-input>
+
           </div>
         </div>
         <el-divider/>
@@ -52,7 +53,9 @@
           <codemirror v-model:value="answerRecord.code" :options="options"/>
 
         </div>
-        <div style="text-align: center">返回</div>
+        <div style="text-align: center">
+          <el-button @click="$router.back(1)" text="plain">返回</el-button>
+        </div>
       </el-col>
     </el-row>
   </el-container>
@@ -126,6 +129,10 @@ export default {
 }
 .error {
   border-color: red;
-  background-color: rgba(255,0,0,0.5);
+  /*background-color: rgba(255,0,0,0.5);*/
+}
+/deep/ .el-textarea__inner {
+  background-color: rgba(255,0,0,0.4);
+
 }
 </style>

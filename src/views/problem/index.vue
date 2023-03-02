@@ -33,7 +33,11 @@
               <el-table :data="answerRecords">
                 <el-table-column prop="createTime" label="提交时间"/>
                 <el-table-column prop="language.name" label="语言"/>
-                <el-table-column prop="executeResult.name" label="提交结果"/>
+                <el-table-column prop="executeResult.name" label="提交结果">
+                  <template #default="scope">
+                    <el-link type="primary" :href="`/answer_record_detail/${scope.row.id}`">{{scope.row.executeResult.name }} </el-link>
+                  </template>
+                </el-table-column>
                 <el-table-column prop="note" label="备注">
                   <template #default="scope">
                     <span v-if="scope.row.note === null">添加备注</span>
@@ -76,10 +80,13 @@
                   <el-tab-pane label="执行结果" name="executeResult">
                     <div>
                       <div v-if="codeConsole.log">
-                        {{codeConsole.log}}
+                        <el-input type="textarea" disabled :rows="6" v-model="codeConsole.log"></el-input>
                       </div>
-                      <div v-if="codeConsole.error">
-                        {{codeConsole.error}}
+                      <div v-else-if="codeConsole.error">
+                        <el-input type="textarea" disabled :rows="6" v-model="codeConsole.error"></el-input>
+                      </div>
+                      <div v-else class="vcenter" style="text-align: center">
+                        请先运行您的代码
                       </div>
                     </div>
                   </el-tab-pane>
@@ -171,26 +178,12 @@ export default {
       languageId: null,
       languageList: [],
       problem: {},
-      code: `package love.huhu.platform;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class PlatformServerApplication {
-
-
-    public static void main(String[] args) {
-        SpringApplication.run(PlatformServerApplication.class, args);
-    }
-
-}
-`,
+      code: ``,
       activeHint: 1,
       answerRecords: [],
       codeConsole: {
         show: null,
-        tab: null,
+        tab: 'testCase',
         testCase: '',
         error: null,
         log: null,
