@@ -69,14 +69,18 @@
           <div style="position:relative; height: 45px">
             <el-collapse class="bottom-fix" v-model="codeConsole.show" accordion >
               <el-collapse-item title="控制台" name="console">
-                <el-tabs type="border-card">
-                  <el-tab-pane label="测试用例">
+                <el-tabs type="border-card" v-model="codeConsole.tab">
+                  <el-tab-pane label="测试用例" name="testCase">
                     <el-input type="textarea" v-model="codeConsole.testCase" resize="none" rows="3"/>
                   </el-tab-pane>
-                  <el-tab-pane label="代码执行结果" >
+                  <el-tab-pane label="执行结果" name="executeResult">
                     <div>
-                      <div>输入</div>
-                      <div>输出</div>
+                      <div v-if="codeConsole.log">
+                        {{codeConsole.log}}
+                      </div>
+                      <div v-if="codeConsole.error">
+                        {{codeConsole.error}}
+                      </div>
                     </div>
                   </el-tab-pane>
                 </el-tabs>
@@ -185,7 +189,10 @@ public class PlatformServerApplication {
       answerRecords: [],
       codeConsole: {
         show: null,
+        tab: null,
         testCase: '',
+        error: null,
+        log: null,
       }
     }
   },
@@ -199,8 +206,12 @@ public class PlatformServerApplication {
       })
     },
     judgeTest() {
-      test(this.answerRecordToJudge).then(data=>{
+      test(this.code,this.codeConsole.testCase).then(data=>{
 
+        this.codeConsole.error = data.error
+        this.codeConsole.log = data.log
+        this.codeConsole.show = 'console'
+        this.codeConsole.tab = 'executeResult'
       })
     },
     getProblem() {
@@ -241,6 +252,7 @@ public class PlatformServerApplication {
           duration: 5000
         })
         this.codeConsole.show = 'console'
+        this.codeConsole.tab = 'testCase'
         return
       }
       this.judgeTest()
