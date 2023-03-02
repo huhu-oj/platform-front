@@ -6,7 +6,7 @@
     <el-main >
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-tabs type="border-card">
+          <el-tabs type="border-card" v-model="leftTab">
             <el-tab-pane label="题目描述" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <div style="margin-bottom: 20px">{{ problem.title }}</div>
@@ -28,7 +28,7 @@
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
             </el-tab-pane>
-            <el-tab-pane label="提交记录" style="height: calc(100vh - 231px)">
+            <el-tab-pane label="提交记录" name="submitRecord" style="height: calc(100vh - 231px)">
               <el-scrollbar>
               <el-table :data="answerRecords">
                 <el-table-column prop="createTime" label="提交时间"/>
@@ -164,6 +164,7 @@ export default {
         matchBrackets: true,//括号匹配
         autocapitalize:true,
       },
+      leftTab: null,
       solutionDetail: {},
       codeEditVisible: true,
       height: document.documentElement.clientHeight - 240,
@@ -200,8 +201,20 @@ public class PlatformServerApplication {
   },
   methods: {
 
-    judge() {
-      judge(this.answerRecordToJudge).then(data=>{
+    submitCode() {
+      let answerRecordToJudge = {
+        code: this.code,
+        languageId: this.languageId,
+        problemId: this.problem.id
+      }
+      judge(answerRecordToJudge).then(data=>{
+        this.codeConsole.error = data.error
+        this.codeConsole.log = data.log
+        this.codeConsole.show = 'console'
+        this.codeConsole.tab = 'executeResult'
+
+        this.leftTab = 'submitRecord'
+        this.getAnswerRecords()
 
       })
     },
