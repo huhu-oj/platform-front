@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :close-on-click-modal="false" v-model="formVisible" :title="formTitle" width="500px">
+  <el-dialog :close-on-click-modal="false"  v-model="formVisible" :title="formTitle" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="标题" prop="title">
         <el-input v-model="form.title" style="width: 370px;" />
@@ -23,7 +23,7 @@
       <el-form-item label="结束时间" prop="endTime">
         <el-date-picker v-model="form.endTime" type="datetime" style="width: 370px;" />
       </el-form-item>
-      <el-form-item label="关联单位" prop="depts">
+      <el-form-item label="关联单位" prop="depts" v-if="formTitle === '新增'">
         <el-tree
             ref="deptTree"
             :data="deptDatas"
@@ -64,8 +64,12 @@
         </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small">修改</el-button>
-            <el-button size="small" type="danger">删除</el-button>
+            <el-button size="small" @click="updateTest(scope.row)">修改</el-button>
+             <el-popconfirm title="确认删除" @confirm="delTest(scope.row)">
+               <template #reference>
+                 <el-button size="small" type="danger" >删除</el-button>
+               </template>
+             </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -84,7 +88,7 @@
 </template>
 
 <script>
-import {get as getMyTests,save as saveTest, update as updateTest} from '@/api/test'
+import {get as getMyTests,save as saveTest, update as updateTest, del as delTest} from '@/api/test'
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
 import {ElNotification} from "element-plus";
@@ -129,7 +133,24 @@ export default {
       })
     },
     addTest() {
+      this.formTitle = '新增'
+      this.form = { id: null, title: null, description: null, examinationPaper: null, startTime: Date.now(), endTime: null, enabled: true, depts:[] }
       this.formVisible = true
+    },
+
+    updateTest(row) {
+      this.formTitle = '修改'
+      this.formVisible = true
+      this.form = row
+    },
+    delTest(row) {
+      delTest(row.id).then(data=>{
+
+        ElNotification.success({
+          title: "删除测验成功"
+        })
+        this.getMyTests()
+      })
     },
     getDeptDatas(node, resolve) {
       const sort = 'id,desc'
@@ -162,6 +183,16 @@ export default {
           ElNotification.success({
             title: "新增测验成功"
           })
+          this.getMyTests()
+        })
+      }else {
+        updateTest(this.form).then(data=>{
+          this.formVisible = false
+
+          ElNotification.success({
+            title: "修改测验成功"
+          })
+          this.getMyTests()
         })
       }
     },

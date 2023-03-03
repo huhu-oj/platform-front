@@ -27,6 +27,8 @@ export function del(testId) {
     return request({
         url: '/api/test',
         method: 'delete',
-        params: testId
+        params: {
+            testId
+        }
     })
 }
