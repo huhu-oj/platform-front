@@ -50,30 +50,7 @@ export default {
     return {
       executeResultId: null,
       executeResultList: [],
-      answerRecords: [
-        {
-          id: 1,
-          problem: {name:'两数之后'},
-          submitCount: 4,
-          records: [
-            {id:1,createTime:'123',language:'java'},
-            {id:2,createTime:'123',language:'java'},
-            {id:3,createTime:'123',language:'java'},
-            {id:4,createTime:'123',language:'java'}
-          ]
-        },
-        {
-          id: 2,
-          submitCount: 4,
-          problem: {name:'数组求和'},
-          records: [
-            {id:1,createTime:'123',language:'java'},
-            {id:2,createTime:'123',language:'java'},
-            {id:3,createTime:'123',language:'java'},
-            {id:4,createTime:'123',language:'java'}
-          ]
-        }
-      ],
+      answerRecords: [],
       answerRecordStat: {
         title: {
 

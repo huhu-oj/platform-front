@@ -1,37 +1,194 @@
 <template>
-  <div v-if="test.length !== 0">
-    <el-card v-for="item in test" class="test">
-      <span>{{item.name}}</span>
-    </el-card>
-  </div>
-  <div v-else >
-    <span style="height: 200px;display: flex;flex-direction: column;justify-content: center;align-items: center">暂无测验</span>
-  </div>
+  <el-dialog :close-on-click-modal="false" v-model="formVisible" :title="formTitle" width="500px">
+    <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
+      <el-form-item label="标题" prop="title">
+        <el-input v-model="form.title" style="width: 370px;" />
+      </el-form-item>
+      <el-form-item label="备注" prop="description">
+        <el-input v-model="form.description" :rows="3" type="textarea" style="width: 370px;" />
+      </el-form-item>
+      <el-form-item label="试卷" prop="examinationPaper">
+        <el-select v-model="form.examinationPaper" value-key="id" filterable placeholder="Select">
+          <el-option
+              v-for="item in examinationPaperList"
+              :key="item.id"
+              :label="item.name"
+              :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="开始时间" prop="startTime">
+        <el-date-picker v-model="form.startTime" type="datetime" style="width: 370px;" />
+      </el-form-item>
+      <el-form-item label="结束时间" prop="endTime">
+        <el-date-picker v-model="form.endTime" type="datetime" style="width: 370px;" />
+      </el-form-item>
+      <el-form-item label="关联单位" prop="depts">
+        <el-tree
+            ref="deptTree"
+            :data="deptDatas"
+            :load="getDeptDatas"
+            :props="defaultProps"
+            :expand-on-click-node="false"
+            v-model="form.depts"
+            lazy
+            show-checkbox
+            @check-change="handleDeptChange"
+        />
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="text" @click="formVisible = false">取消</el-button>
+      <el-button type="primary" @click="submitCU">确认</el-button>
+    </div>
+  </el-dialog>
+  <el-container>
+    <el-header>
+      <el-button @click="addTest">添加</el-button>
+    </el-header>
+    <el-main>
+      <el-table :data="tests">
+        <el-table-column prop="title" label="测验名称"/>
+        <el-table-column prop="examinationPaper.name" label="使用试卷"/>
+        <el-table-column prop="startTime" label="开始时间"/>
+        <el-table-column prop="endTime" label="结束时间"/>
+        <el-table-column prop="enabled" label="是否启用">
+          <template #default="scope">
+            <el-switch
+                v-model="scope.row.enabled"
+                active-color="#409EFF"
+                inactive-color="#F56C6C"
+                @change="changeEnabled(scope.row, scope.row.enabled)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button size="small">修改</el-button>
+            <el-button size="small" type="danger">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div v-if="tests.length !== 0">
+        <el-card v-for="item in tests" class="test">
+          <span>{{item.title}}</span>
+        </el-card>
+      </div>
+      <div v-else >
+        <span style="height: 200px;display: flex;flex-direction: column;justify-content: center;align-items: center">暂无测验</span>
+      </div>
+    </el-main>
+  </el-container>
+
 
 </template>
 
 <script>
-import {get as getMyTests} from '@/api/test'
+import {get as getMyTests,save as saveTest, update as updateTest} from '@/api/test'
+import {getDepts} from "@/api/system/dept";
+import {get as getExaminationPaper} from '@/api/examinationPaper'
+import {ElNotification} from "element-plus";
+
 export default {
   name: "MyTest",
   data() {
     return {
-      test: [
-        {name: '测试1'},
-        {name: '测试2'},
-        {name: '测试3'},
-      ]
+      tests: [],
+      formVisible: false,
+      formTitle: '新增',
+      form: { id: null, title: null, description: null, examinationPaper: null, startTime: Date.now(), endTime: null, enabled: true, depts:[] },
+      rules: {
+        title: [
+          { required: true, message: '标题不能为空', trigger: 'blur' }
+        ],
+        // description: [
+        //   { required: true, message: '备注不能为空', trigger: 'blur' }
+        // ],
+        examinationPaper: [
+          { required: true, message: '试卷不能为空', trigger: 'blur' }
+        ],
+        startTime: [
+          { required: true, message: '开始时间不能为空', trigger: 'blur' }
+        ],
+        endTime: [
+          { required: true, message: '结束时间不能为空', trigger: 'blur' }
+        ],
+        depts: [
+          { required: true, message: '至少关联一个单位', trigger: 'blur' }
+        ]
+      },
+      examinationPaperList: [],
+      deptDatas: [],
+      defaultProps: { children: 'children', label: 'name', isLeaf: 'leaf' },
     }
   },
   methods: {
     getMyTests() {
       getMyTests().then(data=>{
-        this.test = data.content
+        this.tests = data
+      })
+    },
+    addTest() {
+      this.formVisible = true
+    },
+    getDeptDatas(node, resolve) {
+      const sort = 'id,desc'
+      const params = { sort: sort }
+      if (typeof node !== 'object') {
+        if (node) {
+          params['name'] = node
+        }
+      } else if (node.level !== 0) {
+        params['pid'] = node.data.id
+      }
+      setTimeout(() => {
+        getDepts(params).then(res => {
+          if (resolve) {
+            resolve(res.content)
+          } else {
+            this.deptDatas = res.content
+          }
+        })
+      }, 100)
+    },
+    handleDeptChange() {
+      this.form.depts = this.$refs.deptTree.getCheckedNodes()
+      console.log(this.form.depts)
+    },
+    submitCU() {
+      if (this.formTitle === '新增') {
+        saveTest(this.form).then(data=>{
+          this.formVisible = false
+          ElNotification.success({
+            title: "新增测验成功"
+          })
+        })
+      }
+    },
+    getExaminationPapers() {
+      getExaminationPaper().then(data=>{
+        this.examinationPaperList = data.content
+      })
+    },
+    changeEnabled(data, val, op) {
+      this.$confirm('此操作将 "' + op + '" ' + data.title + ', 是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateTest(data).then(res => {
+          this.$notify({title: op + '成功'})
+        }).catch(() => {
+          data.enabled = !data.enabled
+        })
+      }).catch(() => {
+        data.enabled = !data.enabled
       })
     }
   },
   mounted() {
     this.getMyTests()
+    this.getExaminationPapers()
   }
 }
 </script>
