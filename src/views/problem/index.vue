@@ -104,7 +104,7 @@
     </el-main>
     <el-footer class="vcenter">
       <el-row :gutter="20">
-        <el-col :span="12" style="display: flex;padding: 0 10px">
+        <el-col :span="12" style="display: flex;padding: 0 10px" v-if="examinationPaper.problems">
           <el-button @click="problemListVisible = true">题目列表</el-button>
           <div style="display: flex;flex-grow: 5"></div>
 <!--          <el-button>随机一题</el-button>-->
@@ -115,6 +115,7 @@
             <el-button @click="toProblem(problemIndex+1)">下一题</el-button>
           </el-button-group>
         </el-col>
+        <el-col v-else :span="12"></el-col>
         <el-col :span="12" style="display: flex;padding: 0 10px">
 <!--          <el-button>控制台</el-button>-->
           <div style="display: flex;flex-grow: 1"></div>
@@ -263,9 +264,10 @@ export default {
     },
     getExaminationPaper() {
       const examId = this.$route.query.examId
-      if ( examId === null) {
+      if (!examId) {
         return
       }
+      console.log(examId)
       getExaminationPaper(examId).then(data=>{
         this.examinationPaper = data.content[0]
       })
@@ -287,7 +289,7 @@ export default {
     },
     getAnswerRecord() {
       if (this.$route.query.answerRecordId) {
-        getAnswerRecords(this.$route.query.answerRecordId).then(data=>{
+        getAnswerRecords(null,this.$route.query.answerRecordId).then(data=>{
           this.code = data.content[0].code
         })
       }
@@ -316,7 +318,7 @@ export default {
      this.languageId = null
      this.languageList = []
      this.problem = {}
-     // this.examinationPaper = {}
+     this.examinationPaper = {}
      this.problemListVisible = false
      this.code = ``
      this.activeHint = 0
@@ -349,6 +351,7 @@ export default {
       (toParams, previousParams) => {
         // 对路由变化做出响应...
         this.clearData()
+        this.getExaminationPaper()
         this.getProblem()
         this.getAnswerRecords()
       }
