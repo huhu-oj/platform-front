@@ -15,7 +15,7 @@
                 </el-space>
                 <el-divider/>
                 <div v-html="problem.descriptionHtml" ></div>
-                <el-collapse v-model="activeHint" accordion class="bottom-fix" style="width: 100%">
+                <el-collapse v-model="activeHint" accordion  style="width: 100%">
                   <el-collapse-item :title="'提示'+(index+1)" :name="item.id" v-for="(item,index) in problem.hints">
                     {{item.description}}
                   </el-collapse-item>

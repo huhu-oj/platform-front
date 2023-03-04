@@ -98,7 +98,13 @@ export default {
         let content = data.content
         console.log(content)
         let result = []
-        let problems = new Set(content.map(ar=>ar.problem))
+
+        const uniqueFunc = (arr, uniId)=>{
+          const res = new Map();
+          return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
+        }
+
+        let problems = uniqueFunc(content.map(ar=>ar.problem),'id')
         problems.forEach(problem=>{
           let records = content.filter(ar=>ar.problem.id === problem.id)
           result.push({
