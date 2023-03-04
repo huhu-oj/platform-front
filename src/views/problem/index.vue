@@ -40,7 +40,7 @@
                 </el-table-column>
                 <el-table-column prop="note" label="备注">
                   <template #default="scope">
-                    <span v-if="scope.row.note === null">添加备注</span>
+                    <span v-if="!scope.row.note">添加备注</span>
                     <span v-else>{{scope.row.note}}</span>
                   </template>
                 </el-table-column>

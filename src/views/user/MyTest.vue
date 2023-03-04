@@ -43,11 +43,12 @@
     </div>
   </el-dialog>
   <el-container>
-    <el-header>
+    <el-header v-if="manager">
       <el-button @click="addTest">添加</el-button>
     </el-header>
     <el-main>
-      <el-table :data="tests">
+      <el-button @click="manager = !manager">管理</el-button>
+      <el-table v-if="manager" :data="tests">
         <el-table-column prop="title" label="测验名称"/>
         <el-table-column prop="examinationPaper.name" label="使用试卷"/>
         <el-table-column prop="startTime" label="开始时间"/>
@@ -97,6 +98,7 @@ export default {
   name: "MyTest",
   data() {
     return {
+      manager: false,
       tests: [],
       formVisible: false,
       formTitle: '新增',

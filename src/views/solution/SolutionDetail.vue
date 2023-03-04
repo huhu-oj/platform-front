@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-bottom: 20px">{{ solution.problem.title }}</div>
+  <h1 >{{ solution.problem.title }}</h1>
   <el-space wrap>
     <el-tag v-for="item in solution.labels">{{item.name}}</el-tag>
   </el-space>
