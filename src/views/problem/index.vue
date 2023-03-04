@@ -105,14 +105,14 @@
     <el-footer class="vcenter">
       <el-row :gutter="20">
         <el-col :span="12" style="display: flex;padding: 0 10px">
-          <el-button>题目列表</el-button>
+          <el-button @click="problemListVisible = true">题目列表</el-button>
           <div style="display: flex;flex-grow: 5"></div>
 <!--          <el-button>随机一题</el-button>-->
           <div style="display: flex;flex-grow: 1"></div>
           <el-button-group class="ml-4">
-            <el-button >上一题</el-button>
-            <el-button disabled>1/23</el-button>
-            <el-button >下一题</el-button>
+            <el-button @click="toProblem(problemIndex-1)">上一题</el-button>
+            <el-button disabled v-if="examinationPaper.problems">{{problemIndex+1}}/{{problemCount}}</el-button>
+            <el-button @click="toProblem(problemIndex+1)">下一题</el-button>
           </el-button-group>
         </el-col>
         <el-col :span="12" style="display: flex;padding: 0 10px">
@@ -124,6 +124,15 @@
       </el-row>
     </el-footer>
   </el-container>
+  <el-drawer
+    v-model="problemListVisible"
+    direction="ltr"
+    size="20%"
+  >
+    <el-table :data="examinationPaper.problems" @row-click="toProblemById">
+      <el-table-column property="title" align="center" label="题目"  />
+    </el-table>
+  </el-drawer>
 </template>
 <script>
 import navbar from "@/components/navbar/index.vue";
@@ -143,6 +152,7 @@ import {get as getLanguageList} from '@/api/language'
 import {get as getSolutions} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
+import {get as getExaminationPaper } from '@/api/examinationPaper'
 import {judge, test} from "@/api/judge";
 import {ElNotification} from "element-plus";
 import {debounce} from "@/utils";
@@ -178,8 +188,10 @@ export default {
       languageId: null,
       languageList: [],
       problem: {},
+      examinationPaper: {},
+      problemListVisible: false,
       code: ``,
-      activeHint: 1,
+      activeHint: 0,
       answerRecords: [],
       codeConsole: {
         show: null,
@@ -191,9 +203,33 @@ export default {
     }
   },
   computed: {
+    problemCount() {
+      return this.examinationPaper.problems.length
+    },
+    problemIndex() {
+      return this.examinationPaper.problems.findIndex(p=>{
+        return p.id === this.problem.id
+      })
+    }
   },
   methods: {
-
+    toProblemById(row) {
+     this.$router.push({
+        path: `/problem/${row.id}`,
+        query: {examId: this.examinationPaper.id}
+      })
+    },
+    toProblem(problemIndex) {
+      console.log(problemIndex)
+      if (problemIndex>this.problemCount || problemIndex < 0) {
+        return
+      }
+      const problemId = this.examinationPaper.problems[problemIndex].id
+      this.$router.push({
+        path: `/problem/${problemId}`,
+        query: {examId: this.examinationPaper.id}
+      })
+    },
     submitCode() {
       let answerRecordToJudge = {
         code: this.code,
@@ -223,6 +259,15 @@ export default {
     getProblem() {
       getProblemById(this.id).then(data=>{
         this.problem = data.content[0]
+      })
+    },
+    getExaminationPaper() {
+      const examId = this.$route.query.examId
+      if ( examId === null) {
+        return
+      }
+      getExaminationPaper(examId).then(data=>{
+        this.examinationPaper = data.content[0]
       })
     },
     getLanguageList() {
@@ -262,6 +307,28 @@ export default {
         return
       }
       this.judgeTest()
+    },
+    clearData() {
+     this.leftTab = null
+     this.solutionDetail = {}
+     this.codeEditVisible = true
+     this.height = document.documentElement.clientHeight - 240
+     this.languageId = null
+     this.languageList = []
+     this.problem = {}
+     // this.examinationPaper = {}
+     this.problemListVisible = false
+     this.code = ``
+     this.activeHint = 0
+     this.answerRecords = []
+     this.codeConsole = {
+        show: null,
+        tab: 'testCase',
+        testCase: '',
+        error: null,
+        log: null,
+      }
+
     }
   },
   mounted() {
@@ -269,11 +336,23 @@ export default {
     this.getAnswerRecord()
     this.getLanguageList()
     this.getAnswerRecords()
+    this.getExaminationPaper()
     window.addEventListener('resize', debounce(() => {
       if (this.height) {
         this.height = document.documentElement.clientHeight - 240
       }
     }, 100))
+  },
+  created() {
+    this.$watch(
+      () => this.$route.params,
+      (toParams, previousParams) => {
+        // 对路由变化做出响应...
+        this.clearData()
+        this.getProblem()
+        this.getAnswerRecords()
+      }
+    )
   }
 }
 </script>

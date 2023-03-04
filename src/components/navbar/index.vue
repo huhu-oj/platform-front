@@ -6,7 +6,7 @@
     <slot name="left"></slot>
     <div class="vcenter logo">huhuOJ平台</div>
     <div class="flex-grow6"/>
-    <el-menu-item>Processing Center</el-menu-item>
+    <el-menu-item>通知</el-menu-item>
     <el-sub-menu>
       <template #title>
         <el-avatar  :src="'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'" />

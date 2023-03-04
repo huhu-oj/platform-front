@@ -4,6 +4,8 @@ export function get(examinationPaperId) {
     return request({
         url: '/api/examinationPaper',
         method: 'get',
-        params: examinationPaperId
+        params: {
+            id: examinationPaperId
+        }
     })
 }

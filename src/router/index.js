@@ -5,6 +5,7 @@ import myTest from "@/views/user/MyTest.vue";
 import problem from "@/views/problem"
 import answerRecordDetail from "@/views/user/AnswerRecordDetail.vue";
 import loginView from "@/views/LoginView.vue";
+import examinationPaper from "@/views/problem/ExaminationPaper";
 const routes = [
   {
     path: '/',
@@ -33,6 +34,11 @@ const routes = [
   {
     path: '/answer_record_detail/:id',
     component: answerRecordDetail,
+    props: true
+  },
+  {
+    path: '/examination_paper/:id',
+    component: examinationPaper,
     props: true
   },
   {
