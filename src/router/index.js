@@ -80,7 +80,9 @@ router.beforeEach((to, from, next) => {
       NProgress.done()
     } else {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
-        store.dispatch('GetInfo').catch(() => {
+        store.dispatch('GetInfo').then(()=>{
+          next()
+        }).catch(() => {
           store.dispatch('LogOut').then(() => {
             location.reload() // 为了重新实例化vue-router对象 避免bug
           })
@@ -100,5 +102,9 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+
+router.afterEach(() => {
+  NProgress.done() // finish progress bar
+})
 
 export default router

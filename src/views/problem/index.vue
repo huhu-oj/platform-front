@@ -276,9 +276,9 @@ export default {
     getExaminationPaper() {
       const examId = this.$route.query.examId
       if (!examId) {
+        this.getProblem()
         return
       }
-      console.log(examId)
       getExaminationPaper(examId).then(data=>{
         this.examinationPaper = data.content[0]
         this.getProblem()
