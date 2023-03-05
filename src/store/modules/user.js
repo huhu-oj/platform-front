@@ -23,16 +23,10 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const rememberMe = userInfo.rememberMe
-      return new Promise((resolve, reject) => {
-        login(userInfo.username, userInfo.password, userInfo.code, userInfo.uuid).then(res => {
-          setToken(res.token, rememberMe)
-          commit('SET_TOKEN', res.token)
-          setUserInfo(res.user, commit)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+      return login(userInfo).then(res => {
+        setToken(res.token)
+        commit('SET_TOKEN', res.token)
+        setUserInfo(res.user, commit)
       })
     },
 
@@ -49,6 +43,7 @@ const user = {
     },
     // 登出
     LogOut({ commit }) {
+      console.log(1234)
       return new Promise((resolve, reject) => {
         logout().then(res => {
           logOut(commit)

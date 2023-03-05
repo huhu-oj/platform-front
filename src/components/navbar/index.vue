@@ -15,7 +15,7 @@
         <user-menu>
           <template #tail>
             <el-divider/>
-            <el-menu-item>退出登录</el-menu-item>
+            <el-menu-item index="" @click="open">退出登录</el-menu-item>
           </template>
         </user-menu>
       </template>
@@ -26,13 +26,34 @@
 
 <script>
 import userMenu from "@/components/UserMenu/index.vue";
+import { ElMessageBox } from 'element-plus'
+import {mapGetters} from "vuex";
 export default {
   components: {
     userMenu
   },
+  computed: {
+    ...mapGetters([
+        'user'
+    ])
+  },
   methods: {
     getUserInfo() {
 
+    },
+    open() {
+      ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.logout()
+      })
+    },
+    logout() {
+      this.$store.dispatch('LogOut').then(() => {
+        location.reload()
+      })
     }
   }
 }

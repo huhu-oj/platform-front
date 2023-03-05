@@ -17,7 +17,7 @@
             <div class="user-info">
               <el-image style="width: 100px; height: 100px"
                         :src="'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'" fit="fill"/>
-              <div>无糖学霸</div>
+              <div>{{user.nickName}}</div>
             </div>
             <el-divider/>
             <user-menu/>
@@ -36,10 +36,17 @@
 <script>
 import userMenu from "@/components/UserMenu/index.vue";
 import navbar from "@/components/navbar/index.vue";
+
+import {mapGetters} from "vuex";
 export default {
   name: 'HomeView',
   components: {
     navbar,userMenu
+  },
+  computed: {
+    ...mapGetters([
+        'user'
+    ])
   },
   methods: {
     getUser() {

@@ -14,7 +14,7 @@
             <el-input show-password v-model="form.password"
                     placeholder="密码"></el-input>
           </el-form-item>
-          <el-form-item prop="graphicCodeStr">
+          <el-form-item prop="code">
             <el-input v-model="form.code"
                       placeholder="输入图形验证码">
               <template #suffix>
@@ -25,8 +25,9 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="login">
-              登录
+            <el-button v-loading="loading" type="primary" @click="login">
+              <span v-if="!loading">登 录</span>
+              <span v-else>登 录 中...</span>
             </el-button>
             <el-button @click="resetForm('user')">
               重置
@@ -49,7 +50,7 @@ import Cookies from 'js-cookie'
 import {ElNotification} from "element-plus";
 
 export default {
-
+  props: ['redirect'],
   data() {
 
     return {
@@ -61,6 +62,7 @@ export default {
         uuid: '',
 
       },
+      loading: false,
       rules: {
         username: [
           {required: true, message: '账号不能为空', trigger: 'blur'}
@@ -68,7 +70,7 @@ export default {
         password: [
           {required: true, message: '请输入密码', transform: value => value ? value.trim() : '', trigger: 'blur'}
         ],
-        graphicCodeStr: [
+        code: [
           {required: true, message: '请输入验证码', transform: value => value ? value.trim() : '', trigger: 'blur'}
         ]
       }
@@ -81,24 +83,26 @@ export default {
       this.refreshCode();
     },
     login() {
-      login(this.form).then(data=>{
-
-        this.$router.push('/')
-      }).catch(err=>{
-        this.$notify({
-          title: '错误',
-          message: '账号或密码错误',
-          type: 'error',
-          duration: 5000
+      this.$refs.form.validate(valid=>{
+        if (!valid) {
+          this.refreshCode()
+          return
+        }
+        this.loading = true
+        this.$store.dispatch('Login', this.form).then(() => {
+          this.loading = false
+          this.$router.push({ path: this.redirect || '/' })
+        }).catch(() => {
+          this.loading = false
+          this.refreshCode()
         })
-        this.refreshCode()
       })
     },
 
     point() {
       const point = Cookies.get('point') !== undefined
       if (point) {
-        this.$notify({
+        ElNotification({
           title: '提示',
           message: '当前登录状态已过期，请重新登录！',
           type: 'warning',
