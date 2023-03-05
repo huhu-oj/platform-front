@@ -32,12 +32,17 @@ const routes = [
     props: true
   },
   {
+    path: '/problem',
+    component: problem,
+    props: true
+  },
+  {
     path: '/answer_record_detail/:id',
     component: answerRecordDetail,
     props: true
   },
   {
-    path: '/examination_paper/:id',
+    path: '/exam/:id',
     component: examinationPaper,
     props: true
   },

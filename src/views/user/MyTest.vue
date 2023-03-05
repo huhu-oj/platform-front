@@ -75,7 +75,7 @@
         </el-table-column>
       </el-table>
       <div v-if="tests.length !== 0">
-        <el-card v-for="item in tests" class="test" @click="$router.push(`/examination_paper/${item.examinationPaper.id}`)">
+        <el-card v-for="item in tests" class="test" @click="toExaminationPaper(item.id)">
           <span>{{item.title}}</span>
         </el-card>
       </div>
@@ -129,6 +129,11 @@ export default {
     }
   },
   methods: {
+    toExaminationPaper(examId) {
+      this.$router.push({
+        path: `/exam/${examId}`
+      })
+    },
     getMyTests() {
       getMyTests().then(data=>{
         this.tests = data

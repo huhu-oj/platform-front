@@ -8,13 +8,20 @@
         <el-col :span="12">
           <el-tabs type="border-card" v-model="leftTab">
             <el-tab-pane label="题目描述" style="height: calc(100vh - 231px)">
-              <el-scrollbar>
+              <el-scrollbar >
                 <div style="margin-bottom: 20px">{{ problem.title }}</div>
                 <el-space wrap>
                   <el-tag v-for="item in problem.labels">{{item.name}}</el-tag>
                 </el-space>
                 <el-divider/>
-                <div v-html="problem.descriptionHtml" ></div>
+                <mavon-editor
+                    v-model="problem.description"
+                    :subfield="false"
+                    :defaultOpen="'preview'"
+                    :editable="false"
+                    :toolbarsFlag="false"
+                    :boxShadow="false"
+                />
                 <el-collapse v-model="activeHint" accordion  style="width: 100%">
                   <el-collapse-item :title="'提示'+(index+1)" :name="item.id" v-for="(item,index) in problem.hints">
                     {{item.description}}
@@ -80,10 +87,10 @@
                   <el-tab-pane label="执行结果" name="executeResult">
                     <div>
                       <div v-if="codeConsole.log">
-                        <el-input type="textarea" disabled :rows="6" v-model="codeConsole.log"></el-input>
+                        <el-input type="textarea" readonly :rows="6" v-model="codeConsole.log"></el-input>
                       </div>
                       <div v-else-if="codeConsole.error">
-                        <el-input type="textarea" disabled :rows="6" v-model="codeConsole.error"></el-input>
+                        <el-input type="textarea" readonly :rows="6" v-model="codeConsole.error"></el-input>
                       </div>
                       <div v-else class="vcenter" style="text-align: center">
                         请先运行您的代码
@@ -98,7 +105,7 @@
         </el-col>
         <el-col v-else :span="12">
           <el-button @click="codeEditVisible = true">关闭</el-button>
-          <solution-detail  :solution="solutionDetail"/>
+          <solution-detail :solution="solutionDetail"/>
         </el-col>
       </el-row>
     </el-main>
@@ -140,6 +147,7 @@ import navbar from "@/components/navbar/index.vue";
 import solution from "@/views/solution/index.vue";
 import solutionDetail from "@/views/solution/SolutionDetail.vue";
 import Codemirror from 'codemirror-editor-vue3';
+import { mavonEditor } from 'mavon-editor'
 // 编辑器代码格式
 import 'codemirror/mode/javascript/javascript.js';
 // 自动刷新
@@ -157,10 +165,9 @@ import {get as getExaminationPaper } from '@/api/examinationPaper'
 import {judge, test} from "@/api/judge";
 import {ElNotification} from "element-plus";
 import {debounce} from "@/utils";
-
 export default {
   components: {
-    navbar,solution,solutionDetail,Codemirror
+    navbar,solution,solutionDetail,Codemirror,mavonEditor
   },
   props: ['id'],
   data() {
@@ -221,7 +228,6 @@ export default {
       })
     },
     toProblem(problemIndex) {
-      console.log(problemIndex)
       if (problemIndex>this.problemCount || problemIndex < 0) {
         return
       }
@@ -258,8 +264,13 @@ export default {
       })
     },
     getProblem() {
-      getProblemById(this.id).then(data=>{
+      let problemId = this.id
+      if (!problemId) {
+        problemId = this.examinationPaper.problems[0].id
+      }
+      getProblemById(problemId).then(data=>{
         this.problem = data.content[0]
+        this.getAnswerRecords()
       })
     },
     getExaminationPaper() {
@@ -270,6 +281,7 @@ export default {
       console.log(examId)
       getExaminationPaper(examId).then(data=>{
         this.examinationPaper = data.content[0]
+        this.getProblem()
       })
     },
     getLanguageList() {
@@ -334,10 +346,8 @@ export default {
     }
   },
   mounted() {
-    this.getProblem()
     this.getAnswerRecord()
     this.getLanguageList()
-    this.getAnswerRecords()
     this.getExaminationPaper()
     window.addEventListener('resize', debounce(() => {
       if (this.height) {
@@ -352,8 +362,6 @@ export default {
         // 对路由变化做出响应...
         this.clearData()
         this.getExaminationPaper()
-        this.getProblem()
-        this.getAnswerRecords()
       }
     )
   }
@@ -378,5 +386,14 @@ export default {
   justify-content: center;
 }
 
+:deep(.el-textarea__inner) {
+  background-color: rgba(255,0,0,0.4);
 
+}
+:deep(.el-scrollbar__wrap--hidden-default) {
+  --el-scrollbar-opacity: 0
+}
+:deep(.el-scrollbar) {
+  --el-scrollbar-opacity: 0
+}
 </style>

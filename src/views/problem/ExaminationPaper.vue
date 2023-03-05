@@ -11,7 +11,16 @@
             <el-step title="测验开始" />
             <el-step title="测验已结束" />
           </el-steps>
-          <div v-html="examinationPaper.descriptionHtml"/>
+
+          <mavon-editor
+              v-model="test.examinationPaper.description"
+              :subfield="false"
+              :defaultOpen="'preview'"
+              :editable="false"
+              :toolbarsFlag="false"
+              :boxShadow="false"
+          />
+
           <div v-if="step+1 === 1">
             <span>测验未开始</span>
           </div>
@@ -34,34 +43,46 @@
 
 <script>
 import navbar from "@/components/navbar";
-import {get as getPaper} from '@/api/examinationPaper'
+import {get as getTest} from '@/api/test'
+import { mavonEditor } from 'mavon-editor'
 export default {
   name: "ExaminationPaper",
   components: {
-    navbar
+    navbar,mavonEditor
   },
   props: ['id'],
   data() {
     return {
-      examinationPaper: {},
+      test: { examinationPaper: {problems: []}},
       step: 0,
     }
   },
   methods: {
-    getPaperInfo() {
-      getPaper(this.id).then(data=>{
-        this.examinationPaper = data.content[0]
+    getTestInfo() {
+      getTest(this.id).then(data=>{
+        this.test = data[0]
+        //判断阶段
+        const currentTime = Date.parse(new Date())
+        const startTime = Date.parse(this.test.startTime)
+        const endTime = Date.parse(this.test.endTime)
+        if (currentTime < startTime) {
+          this.step = 0
+        } else if (currentTime > startTime && currentTime < endTime) {
+          this.step = 1
+        } else {
+          this.step = 2
+        }
       })
     },
     toProblem() {
       this.$router.push({
-            path: `/problem/${this.examinationPaper.problems[0].id}`,
-            query: {examId: this.examinationPaper.id}
+            path: `/problem`,
+            query: {examId: this.test.examinationPaper.id}
           })
     }
   },
   created() {
-    this.getPaperInfo()
+    this.getTestInfo()
   }
 }
 </script>

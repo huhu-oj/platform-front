@@ -30,9 +30,8 @@
             </div>
 
           </div>
-          <div class="border error" v-if="answerRecord.error">
+          <div class="error" v-if="answerRecord.error">
             <el-input type="textarea" :rows="6" readonly resize="none" v-model="answerRecord.error"></el-input>
-
           </div>
         </div>
         <el-divider/>
@@ -128,10 +127,10 @@ export default {
   width: 100%;
 }
 .error {
-  border-color: red;
+  /*border-color: red;*/
   /*background-color: rgba(255,0,0,0.5);*/
 }
-/deep/ .el-textarea__inner {
+:deep(.el-textarea__inner) {
   background-color: rgba(255,0,0,0.4);
 
 }
