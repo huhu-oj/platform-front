@@ -53,22 +53,27 @@
         <el-table-column prop="examinationPaper.name" label="使用试卷"/>
         <el-table-column prop="startTime" label="开始时间"/>
         <el-table-column prop="endTime" label="结束时间"/>
-        <el-table-column prop="enabled" label="是否启用">
+        <el-table-column prop="enabled" label="状态">
           <template #default="scope">
-            <el-switch
-                v-model="scope.row.enabled"
-                active-color="#409EFF"
-                inactive-color="#F56C6C"
-                @change="changeEnabled(scope.row, scope.row.enabled)"
-            />
+<!--            <el-switch-->
+<!--                v-model="scope.row.enabled"-->
+<!--                active-color="#409EFF"-->
+<!--                inactive-color="#F56C6C"-->
+<!--                @change="changeEnabled(scope.row, scope.row.enabled)"-->
+<!--            />-->
+            <span v-if="checkTestStatus(scope.row) === -1">未开始</span>
+            <span v-if="checkTestStatus(scope.row) === 0">进行中</span>
+            <span v-if="checkTestStatus(scope.row) === 1">已结束</span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" @click="updateTest(scope.row)">修改</el-button>
+            <el-button size="small" :disabled="checkTestStatus(scope.row) !== -1" @click="updateTest(scope.row)">修改</el-button>
              <el-popconfirm title="确认删除" @confirm="delTest(scope.row)">
                <template #reference>
-                 <el-button size="small" type="danger" >删除</el-button>
+                 <el-button v-if="checkTestStatus(scope.row) === -1" size="small" type="danger" >删除</el-button>
+                 <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >立即结束</el-button>
+                 <el-button v-if="checkTestStatus(scope.row) === 1" :disabled="checkTestStatus(scope.row) === 1" size="small" type="danger" >删除</el-button>
                </template>
              </el-popconfirm>
           </template>
@@ -129,6 +134,18 @@ export default {
     }
   },
   methods: {
+    checkTestStatus(test) {
+      const currentTime = Date.parse(new Date())
+      const startTime = Date.parse(test.startTime)
+      const endTime = Date.parse(test.endTime)
+      if (currentTime < startTime) {
+        return -1
+      } else if (currentTime > startTime && currentTime < endTime) {
+        return 0
+      } else {
+        return 1
+      }
+    },
     toExaminationPaper(examId) {
       this.$router.push({
         path: `/exam/${examId}`
