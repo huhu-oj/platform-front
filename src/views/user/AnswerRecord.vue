@@ -52,36 +52,104 @@ export default {
       executeResultList: [],
       answerRecords: [],
       answerRecordStat: {
-        title: {
-
-        },
         tooltip: {
-          trigger: 'item'
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)'
         },
         legend: {
-          orient: 'vertical',
-          left: 'left'
+          // orient: 'vertical',
+          type: 'scroll',
+          top: 0,
+          // bottom: 0
         },
+        dataset: [
+          {
+            source: [
+              { value: 1548, name: '数组' },
+              { value: 775, name: '二叉树' },
+              { value: 679, name: '动态规划' }
+            ]
+          },
+          {
+            source: [
+              { value: 1548, name: '量子力学' },
+              { value: 1775, name: '动态规划' },
+              { value: 679, name: '九宫格' }
+            ]
+          },
+          {
+            source: [
+              { value: 10, name: 'python' },
+              { value: 20, name: 'java' },
+              { value: 20, name: 'go' }
+            ]
+          },
+          {
+            source: [
+              { value: 5, name: '已通过' },
+              { value: 10, name: '未通过' }
+            ]
+          },
+        ],
         series: [
           {
-            name: 'Access From',
+            name: '标签',
             type: 'pie',
-            radius: '50%',
-            data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' }
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
+            selectedMode: 'single',
+            radius: [0, '24%'],
+            label: {
+              show: false
+            },
+            labelLine: {
+              show: false
+            },
+            encode: {
+              itemName: 'name',
+              tooltip: '{a} <br/>{b}: {@value} ({d}%)'
+            },
+            datasetIndex: 0
+          },
+          {
+            name: '知识点',
+            type: 'pie',
+            selectedMode: 'single',
+            radius: ['25%', '49%'],
+            label: {
+              show: false
+            },
+            labelLine: {
+              show: false
+            },
+            datasetIndex: 1
+
+          },
+          {
+            name: '语言',
+            type: 'pie',
+            radius: ['50%', '74%'],
+            labelLine: {
+              length: 30
+            },
+            label: {
+              show: false
+            },
+            datasetIndex: 2
+
+          },
+          {
+            name: '题目',
+            type: 'pie',
+            radius: ['75%', '95%'],
+            labelLine: {
+              length: 30
+            },
+            label: {
+              show: false
+            },
+            datasetIndex: 3
+
+          },
+
         ]
       },
       chart: null
