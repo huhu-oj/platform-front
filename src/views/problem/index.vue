@@ -30,7 +30,7 @@
               </el-scrollbar>
 
             </el-tab-pane>
-            <el-tab-pane label="题解" style="height: calc(100vh - 231px)">
+            <el-tab-pane label="题解" v-if="checkTestStatus(test) !== 1" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
@@ -158,6 +158,7 @@ import 'codemirror/addon/fold/foldcode'
 import 'codemirror/theme/dracula.css';
 
 import {get as getLanguageList} from '@/api/language'
+import {get as getTest} from '@/api/test'
 import {get as getSolutions} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
@@ -197,6 +198,7 @@ export default {
       languageList: [],
       problem: {},
       examinationPaper: {},
+      test: {},
       problemListVisible: false,
       code: ``,
       activeHint: 0,
@@ -279,6 +281,9 @@ export default {
         this.getProblem()
         return
       }
+      getTest(examId).then(data=>{
+        this.test = data[0]
+      })
       getExaminationPaper(examId).then(data=>{
         this.examinationPaper = data.content[0]
         this.getProblem()
@@ -321,6 +326,18 @@ export default {
         return
       }
       this.judgeTest()
+    },
+    checkTestStatus(test) {
+      const currentTime = Date.parse(new Date())
+      const startTime = Date.parse(test.startTime)
+      const endTime = Date.parse(test.endTime)
+      if (currentTime < startTime) {
+        return -1
+      } else if (currentTime > startTime && currentTime < endTime) {
+        return 0
+      } else {
+        return 1
+      }
     },
     clearData() {
      this.leftTab = null
