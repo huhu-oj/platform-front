@@ -60,7 +60,7 @@ export default {
   methods: {
     getTestInfo() {
       getTest(this.id).then(data=>{
-        this.test = data[0]
+        this.test = data.content[0]
         //判断阶段
         const currentTime = Date.parse(new Date())
         const startTime = Date.parse(this.test.startTime)

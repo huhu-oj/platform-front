@@ -30,7 +30,7 @@
               </el-scrollbar>
 
             </el-tab-pane>
-            <el-tab-pane label="题解" v-if="checkTestStatus(test) !== 1" style="height: calc(100vh - 231px)">
+            <el-tab-pane label="题解" v-if="test && checkTestStatus(test) === 1" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
@@ -111,14 +111,14 @@
     </el-main>
     <el-footer class="vcenter">
       <el-row :gutter="20">
-        <el-col :span="12" style="display: flex;padding: 0 10px" v-if="examinationPaper.problems">
+        <el-col :span="12" style="display: flex;padding: 0 10px" v-if="examinationPaper.examinationPaperProblems">
           <el-button @click="problemListVisible = true">题目列表</el-button>
           <div style="display: flex;flex-grow: 5"></div>
 <!--          <el-button>随机一题</el-button>-->
           <div style="display: flex;flex-grow: 1"></div>
           <el-button-group class="ml-4">
             <el-button @click="toProblem(problemIndex-1)">上一题</el-button>
-            <el-button disabled v-if="examinationPaper.problems">{{problemIndex+1}}/{{problemCount}}</el-button>
+            <el-button disabled v-if="examinationPaper.examinationPaperProblems">{{problemIndex+1}}/{{problemCount}}</el-button>
             <el-button @click="toProblem(problemIndex+1)">下一题</el-button>
           </el-button-group>
         </el-col>
@@ -137,8 +137,8 @@
     direction="ltr"
     size="20%"
   >
-    <el-table :data="examinationPaper.problems" @row-click="toProblemById">
-      <el-table-column property="title" align="center" label="题目"  />
+    <el-table :data="examinationPaper.examinationPaperProblems" @row-click="toProblemById">
+      <el-table-column property="problem.title" align="center" label="题目"  />
     </el-table>
   </el-drawer>
 </template>
@@ -198,7 +198,7 @@ export default {
       languageList: [],
       problem: {},
       examinationPaper: {},
-      test: {},
+      test: null,
       problemListVisible: false,
       code: ``,
       activeHint: 0,
@@ -214,18 +214,18 @@ export default {
   },
   computed: {
     problemCount() {
-      return this.examinationPaper.problems.length
+      return this.examinationPaper.examinationPaperProblems.length
     },
     problemIndex() {
-      return this.examinationPaper.problems.findIndex(p=>{
-        return p.id === this.problem.id
+      return this.examinationPaper.examinationPaperProblems.findIndex(p=>{
+        return p.problem.id === this.problem.id
       })
     }
   },
   methods: {
     toProblemById(row) {
      this.$router.push({
-        path: `/problem/${row.id}`,
+        path: `/problem/${row.problem.id}`,
         query: {examId: this.examinationPaper.id}
       })
     },
@@ -233,7 +233,7 @@ export default {
       if (problemIndex>this.problemCount || problemIndex < 0) {
         return
       }
-      const problemId = this.examinationPaper.problems[problemIndex].id
+      const problemId = this.examinationPaper.examinationPaperProblems[problemIndex].id
       this.$router.push({
         path: `/problem/${problemId}`,
         query: {examId: this.examinationPaper.id}
@@ -268,7 +268,7 @@ export default {
     getProblem() {
       let problemId = this.id
       if (!problemId) {
-        problemId = this.examinationPaper.problems[0].id
+        problemId = this.examinationPaper.examinationPaperProblems[0].id
       }
       getProblemById(problemId).then(data=>{
         this.problem = data.content[0]
@@ -282,7 +282,7 @@ export default {
         return
       }
       getTest(examId).then(data=>{
-        this.test = data[0]
+        this.test = data.content[0]
       })
       getExaminationPaper(examId).then(data=>{
         this.examinationPaper = data.content[0]
@@ -308,6 +308,9 @@ export default {
       if (this.$route.query.answerRecordId) {
         getAnswerRecords(null,this.$route.query.answerRecordId).then(data=>{
           this.code = data.content[0].code
+          getTest(data.content[0].testId).then(testData => {
+            this.test = testData.content[0]
+          })
         })
       }
     },
@@ -336,6 +339,7 @@ export default {
       } else if (currentTime > startTime && currentTime < endTime) {
         return 0
       } else {
+        console.log(test)
         return 1
       }
     },

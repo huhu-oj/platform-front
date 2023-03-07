@@ -153,7 +153,7 @@ export default {
     },
     getMyTests() {
       getMyTests().then(data=>{
-        this.tests = data
+        this.tests = data.content
       })
     },
     addTest() {
