@@ -34,6 +34,7 @@
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
+              <el-button type="primary" :icon="Plus" circle size="large" style="position:absolute; bottom: 10px; right: 10px" />
             </el-tab-pane>
             <el-tab-pane label="提交记录" name="submitRecord" style="height: calc(100vh - 231px)">
               <el-scrollbar>
@@ -147,6 +148,7 @@ import navbar from "@/components/navbar/index.vue";
 import solution from "@/views/solution/index.vue";
 import solutionDetail from "@/views/solution/SolutionDetail.vue";
 import Codemirror from 'codemirror-editor-vue3';
+import { Edit, Plus } from '@element-plus/icons-vue'
 import { mavonEditor } from 'mavon-editor'
 // 编辑器代码格式
 import 'codemirror/mode/javascript/javascript.js';
@@ -168,7 +170,7 @@ import {ElNotification} from "element-plus";
 import {debounce} from "@/utils";
 export default {
   components: {
-    navbar,solution,solutionDetail,Codemirror,mavonEditor
+    navbar,solution,solutionDetail,Codemirror,mavonEditor,Edit,Plus
   },
   props: ['id'],
   data() {
@@ -213,6 +215,12 @@ export default {
     }
   },
   computed: {
+    Plus() {
+      return Plus
+    },
+    Edit() {
+      return Edit
+    },
     problemCount() {
       return this.examinationPaper.examinationPaperProblems.length
     },
