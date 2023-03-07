@@ -34,7 +34,9 @@
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
-              <el-button type="primary" :icon="Plus" circle size="large" style="position:absolute; bottom: 10px; right: 10px" />
+              <el-button type="primary" circle size="large" style="position:absolute; bottom: 10px; right: 10px" @click="rightSideVisible = 'solutionAdd'">
+                <template #icon><Plus/></template>
+              </el-button>
             </el-tab-pane>
             <el-tab-pane label="提交记录" name="submitRecord" style="height: calc(100vh - 231px)">
               <el-scrollbar>
@@ -57,7 +59,7 @@
             </el-tab-pane>
           </el-tabs>
         </el-col>
-        <el-col v-if="codeEditVisible" :span="12" >
+        <el-col v-if="rightSideVisible === 'codeEdit'" :span="12" >
           <div style="display: flex">
             <el-select v-model="languageId" placeholder="Select">
               <el-option
@@ -104,9 +106,46 @@
           </div>
 
         </el-col>
-        <el-col v-else :span="12">
-          <el-button @click="codeEditVisible = true">关闭</el-button>
+        <el-col v-else-if="rightSideVisible === 'solutionDetail'" :span="12">
+          <el-button @click="rightSideVisible = 'codeEdit'">关闭</el-button>
           <solution-detail :solution="solutionDetail"/>
+        </el-col>
+        <el-col v-else-if="rightSideVisible === 'solutionAdd'" :span="12">
+          <div style="display: flex">
+            <el-button @click="rightSideVisible = 'codeEdit'">关闭</el-button>
+            <div style="display: flex;flex-grow: 1"></div>
+            <el-button type="success" @click="addSolution">提交</el-button>
+          </div>
+          <el-form>
+            <el-form-item label="标题">
+              <el-input v-model="solution.title"/>
+            </el-form-item>
+            <mavon-editor
+                v-model="solution.description"
+                :boxShadow="false"
+            />
+            <el-form-item label="标签" prop="label">
+              <el-select
+                  v-model="solution.labels"
+                  value-key="id"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  :reserve-keyword="false"
+                  placeholder="关联标签"
+              >
+                <el-option
+                    v-for="item in labelList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+
+
         </el-col>
       </el-row>
     </el-main>
@@ -161,10 +200,11 @@ import 'codemirror/theme/dracula.css';
 
 import {get as getLanguageList} from '@/api/language'
 import {get as getTest} from '@/api/test'
-import {get as getSolutions} from '@/api/solution'
+import {get as getSolutions,save as saveSolution} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
 import {get as getExaminationPaper } from '@/api/examinationPaper'
+import {get as getLabelList} from '@/api/label'
 import {judge, test} from "@/api/judge";
 import {ElNotification} from "element-plus";
 import {debounce} from "@/utils";
@@ -194,12 +234,14 @@ export default {
       },
       leftTab: null,
       solutionDetail: {},
-      codeEditVisible: true,
+      rightSideVisible: 'codeEdit',
       height: document.documentElement.clientHeight - 240,
       languageId: null,
       languageList: [],
+      labelList: [],
       problem: {},
       examinationPaper: {},
+      solution: {},
       test: null,
       problemListVisible: false,
       code: ``,
@@ -215,12 +257,6 @@ export default {
     }
   },
   computed: {
-    Plus() {
-      return Plus
-    },
-    Edit() {
-      return Edit
-    },
     problemCount() {
       return this.examinationPaper.examinationPaperProblems.length
     },
@@ -231,6 +267,19 @@ export default {
     }
   },
   methods: {
+    getLabelList() {
+      getLabelList().then(data=>{
+        this.labelList = data
+      })
+    },
+    addSolution() {
+      this.solution.problem = this.problem
+      saveSolution(this.solution).then(data=>{
+        this.getSolutions()
+        this.showSolution(data)
+        this.rightSideVisible = 'solutionDetail'
+      })
+    },
     toProblemById(row) {
      this.$router.push({
         path: `/problem/${row.problem.id}`,
@@ -324,7 +373,7 @@ export default {
     },
     showSolution(item) {
       this.solutionDetail = item
-      this.codeEditVisible = false
+      this.rightSideVisible = 'solutionDetail'
     },
     testCode() {
       if (this.codeConsole.testCase.length === 0) {
@@ -354,7 +403,7 @@ export default {
     clearData() {
      this.leftTab = null
      this.solutionDetail = {}
-     this.codeEditVisible = true
+     this.rightSideVisible = 'codeEdit'
      this.height = document.documentElement.clientHeight - 240
      this.languageId = null
      this.languageList = []
@@ -377,6 +426,7 @@ export default {
   mounted() {
     this.getAnswerRecord()
     this.getLanguageList()
+    this.getLabelList()
     this.getExaminationPaper()
     window.addEventListener('resize', debounce(() => {
       if (this.height) {
