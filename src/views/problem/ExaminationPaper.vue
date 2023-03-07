@@ -77,7 +77,7 @@ export default {
     toProblem() {
       this.$router.push({
             path: `/problem`,
-            query: {examId: this.test.examinationPaper.id}
+            query: {examId: this.test.id}
           })
     }
   },

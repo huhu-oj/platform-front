@@ -8,6 +8,7 @@
       <el-divider/>
       <!--  <div v-html="solution.descriptionHtml"></div>-->
       <mavon-editor
+          style="min-height: auto;"
           v-model="solution.description"
           :subfield="false"
           :defaultOpen="'preview'"

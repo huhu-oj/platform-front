@@ -30,7 +30,7 @@
               </el-scrollbar>
 
             </el-tab-pane>
-            <el-tab-pane label="题解" v-if="test && checkTestStatus(test) === 1" style="height: calc(100vh - 231px)">
+            <el-tab-pane label="题解" name="solution" v-if="test && checkTestStatus(test) === 1" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
@@ -120,10 +120,6 @@
             <el-form-item label="标题">
               <el-input v-model="solution.title"/>
             </el-form-item>
-            <mavon-editor
-                v-model="solution.description"
-                :boxShadow="false"
-            />
             <el-form-item label="标签" prop="label">
               <el-select
                   v-model="solution.labels"
@@ -143,9 +139,11 @@
                 />
               </el-select>
             </el-form-item>
+            <mavon-editor
+                v-model="solution.description"
+                :boxShadow="false"
+            />
           </el-form>
-
-
         </el-col>
       </el-row>
     </el-main>
@@ -163,12 +161,14 @@
           </el-button-group>
         </el-col>
         <el-col v-else :span="12"></el-col>
-        <el-col :span="12" style="display: flex;padding: 0 10px">
-<!--          <el-button>控制台</el-button>-->
+        <el-col :span="12" v-if="rightSideVisible === 'codeEdit'" style="display: flex;padding: 0 10px">
+          <el-button v-if="test && checkTestStatus(test) === 0">交卷</el-button>
           <div style="display: flex;flex-grow: 1"></div>
           <el-button @click="testCode">执行代码</el-button>
           <el-button type="success" @click="submitCode">提交</el-button>
         </el-col>
+        <el-col v-else :span="12"></el-col>
+
       </el-row>
     </el-footer>
   </el-container>
@@ -300,7 +300,8 @@ export default {
       let answerRecordToJudge = {
         code: this.code,
         languageId: this.languageId,
-        problemId: this.problem.id
+        problemId: this.problem.id,
+        testId: this.test.id
       }
       judge(answerRecordToJudge).then(data=>{
         this.codeConsole.error = data.error
@@ -340,11 +341,12 @@ export default {
       }
       getTest(examId).then(data=>{
         this.test = data.content[0]
+        getExaminationPaper(this.test.examinationPaper.id).then(epData=>{
+          this.examinationPaper = epData.content[0]
+          this.getProblem()
+        })
       })
-      getExaminationPaper(examId).then(data=>{
-        this.examinationPaper = data.content[0]
-        this.getProblem()
-      })
+
     },
     getLanguageList() {
       getLanguageList().then(data=>{
@@ -363,6 +365,7 @@ export default {
     },
     getAnswerRecord() {
       if (this.$route.query.answerRecordId) {
+        // this.getProblem()
         getAnswerRecords(null,this.$route.query.answerRecordId).then(data=>{
           this.code = data.content[0].code
           getTest(data.content[0].testId).then(testData => {
@@ -396,7 +399,6 @@ export default {
       } else if (currentTime > startTime && currentTime < endTime) {
         return 0
       } else {
-        console.log(test)
         return 1
       }
     },
@@ -424,10 +426,10 @@ export default {
     }
   },
   mounted() {
+    this.getExaminationPaper()
     this.getAnswerRecord()
     this.getLanguageList()
     this.getLabelList()
-    this.getExaminationPaper()
     window.addEventListener('resize', debounce(() => {
       if (this.height) {
         this.height = document.documentElement.clientHeight - 240
@@ -474,5 +476,8 @@ export default {
 }
 :deep(.el-scrollbar) {
   --el-scrollbar-opacity: 0
+}
+.v-note-wrapper{
+  /*max-height: calc(100vh - 300px);*/
 }
 </style>

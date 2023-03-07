@@ -21,44 +21,14 @@ export default {
   emits: ['showDetail'],
   data() {
     return {
-      solutions: [
-        {
-          id:1,
-          title: '123',
-          description: '132123',
-          user: {
-            id:1,
-            name: 'ren',
-            avatar: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-          }
-        },
-        {
-          id:2,
-          title: '12312',
-          description: '13212312',
-          user: {
-            id:1,
-            name: 'ren',
-            avatar: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-          }
-        },
-        {
-          id:1,
-          title: '123',
-          description: '132123',
-          user: {
-            id:1,
-            name: 'ren',
-            avatar: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-          }
-        },
-      ]
+      solutions: []
     }
   },
   watch: {
     //正确给 cData 赋值的 方法
     problemId(newVal,oldVal){
-      newVal && this.getSolutions(); //newVal存在的话执行dataChild函数
+      console.log(newVal)
+      newVal && this.getSolutions(); //newVal存在的话执行
     }
   },
   methods: {
