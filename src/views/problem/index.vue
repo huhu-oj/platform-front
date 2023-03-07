@@ -331,27 +331,34 @@ export default {
         this.codeConsole.tab = 'executeResult'
       })
     },
-    getProblem() {
+    getProblem(callback) {
       let problemId = this.id
       if (!problemId) {
         problemId = this.examinationPaper.examinationPaperProblems[0].id
       }
       getProblemById(problemId).then(data=>{
         this.problem = data.content[0]
-        this.getAnswerRecords()
+        callback(problemId)
       })
     },
     getExaminationPaper() {
       const examId = this.$route.query.examId
       if (!examId) {
-        this.getProblem()
+        this.getProblem(()=>{
+          this.getAnswerRecords()
+        })
         return
       }
       getTest(examId).then(data=>{
         this.test = data.content[0]
         getExaminationPaper(this.test.examinationPaper.id).then(epData=>{
           this.examinationPaper = epData.content[0]
-          this.getProblem()
+          this.getProblem(problemId=>{
+            getAnswerRecords(this.examinationPaper.examinationPaperProblems[0].id,null,this.test.id).then(answerRecordData=>{
+              this.answerRecords = answerRecordData.content
+            })
+          })
+
         })
       })
 
@@ -367,20 +374,21 @@ export default {
       })
     },
     getAnswerRecords() {
-      getAnswerRecords(this.problem.id).then(data=>{
+      // this.checkTestStatus(this.test)
+      getAnswerRecords(this.test.id, this.problem.id).then(data=>{
         this.answerRecords = data.content
       })
     },
     getAnswerRecord() {
-      if (this.$route.query.answerRecordId) {
-        // this.getProblem()
+      if (!this.$route.query.answerRecordId) {
+        return
+      }
         getAnswerRecords(null,this.$route.query.answerRecordId).then(data=>{
           this.code = data.content[0].code
           getTest(data.content[0].testId).then(testData => {
             this.test = testData.content[0]
           })
         })
-      }
     },
     showSolution(item) {
       this.solutionDetail = item

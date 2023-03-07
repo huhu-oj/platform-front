@@ -1,11 +1,11 @@
 import request from '@/utils/request'
 
-export function get(problemId,answerRecordId) {
+export function get(problemId,answerRecordId,testId) {
     return request({
         url: '/api/answerRecord',
         method: 'get',
         params: {
-            problemId,answerRecordId
+            problemId,answerRecordId,testId
         }
     })
 }
