@@ -162,7 +162,7 @@
         </el-col>
         <el-col v-else :span="12"></el-col>
         <el-col :span="12" v-if="rightSideVisible === 'codeEdit'" style="display: flex;padding: 0 10px">
-          <el-button v-if="test && checkTestStatus(test) === 0">交卷</el-button>
+          <el-button v-if="test && checkTestStatus(test) === 0" @click="submitTest">交卷</el-button>
           <div style="display: flex;flex-grow: 1"></div>
           <el-button @click="testCode">执行代码</el-button>
           <el-button type="success" @click="submitCode">提交</el-button>
@@ -199,7 +199,7 @@ import 'codemirror/addon/fold/foldcode'
 import 'codemirror/theme/dracula.css';
 
 import {get as getLanguageList} from '@/api/language'
-import {get as getTest} from '@/api/test'
+import {get as getTest,saveRecord} from '@/api/test'
 import {get as getSolutions,save as saveSolution} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
@@ -267,6 +267,14 @@ export default {
     }
   },
   methods: {
+    submitTest() {
+      const testRecord = {
+        testId: this.test.id
+      }
+      saveRecord(testRecord).then(data=>{
+        console.log(data)
+      })
+    },
     getLabelList() {
       getLabelList().then(data=>{
         this.labelList = data

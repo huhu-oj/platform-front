@@ -16,6 +16,13 @@ export function save(data) {
         data
     })
 }
+export function saveRecord(data) {
+    return request({
+        url: '/api/test/record',
+        method: 'post',
+        data
+    })
+}
 export function update(data) {
     return request({
         url: '/api/test',
