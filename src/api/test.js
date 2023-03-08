@@ -23,6 +23,15 @@ export function saveRecord(data) {
         data
     })
 }
+export function getRecord(testId) {
+    return request({
+        url: '/api/test/record',
+        method: 'get',
+        params: {
+            testId
+        }
+    })
+}
 export function update(data) {
     return request({
         url: '/api/test',

@@ -5,7 +5,9 @@
   >
     <slot name="left"></slot>
     <div class="vcenter logo">huhuOJ平台</div>
-    <div class="flex-grow6"/>
+    <div class="flex-grow6">
+      <slot name="center"/>
+    </div>
     <el-menu-item>通知</el-menu-item>
     <el-sub-menu>
       <template #title>
@@ -61,6 +63,7 @@ export default {
 
 <style scoped>
 .flex-grow6 {
+  display: flex;
   flex-grow: 6;
 }
 .logo {

@@ -1,7 +1,13 @@
 <template>
   <el-container class="container">
     <el-header>
-      <navbar/>
+      <navbar>
+        <template #center v-if="testStatus === 0">
+          <div style="display: flex;flex-grow: 1"/>
+          <el-countdown title="离测验结束还有" :value="testCountdown" />
+          <div style="display: flex;flex-grow: 1"/>
+        </template>
+      </navbar>
     </el-header>
     <el-main >
       <el-row :gutter="20">
@@ -30,7 +36,7 @@
               </el-scrollbar>
 
             </el-tab-pane>
-            <el-tab-pane label="题解" name="solution" v-if="test && checkTestStatus(test) === 1" style="height: calc(100vh - 231px)">
+            <el-tab-pane label="题解" name="solution" v-if="testStatus === 1" style="height: calc(100vh - 231px)">
               <el-scrollbar>
                 <solution :problemId="problem.id" @show-detail="showSolution"/>
               </el-scrollbar>
@@ -149,20 +155,20 @@
     </el-main>
     <el-footer class="vcenter">
       <el-row :gutter="20">
-        <el-col :span="12" style="display: flex;padding: 0 10px" v-if="examinationPaper.examinationPaperProblems">
+        <el-col :span="12" style="display: flex;padding: 0 10px" v-if="testProblems">
           <el-button @click="problemListVisible = true">题目列表</el-button>
           <div style="display: flex;flex-grow: 5"></div>
 <!--          <el-button>随机一题</el-button>-->
           <div style="display: flex;flex-grow: 1"></div>
           <el-button-group class="ml-4">
             <el-button @click="toProblem(problemIndex-1)">上一题</el-button>
-            <el-button disabled v-if="examinationPaper.examinationPaperProblems">{{problemIndex+1}}/{{problemCount}}</el-button>
+            <el-button disabled v-if="testProblems">{{problemIndex+1}}/{{problemCount}}</el-button>
             <el-button @click="toProblem(problemIndex+1)">下一题</el-button>
           </el-button-group>
         </el-col>
         <el-col v-else :span="12"></el-col>
         <el-col :span="12" v-if="rightSideVisible === 'codeEdit'" style="display: flex;padding: 0 10px">
-          <el-button v-if="test && checkTestStatus(test) === 0" @click="submitTest">交卷</el-button>
+          <el-button v-if="testStatus === 0" @click="submitTest">交卷</el-button>
           <div style="display: flex;flex-grow: 1"></div>
           <el-button @click="testCode">执行代码</el-button>
           <el-button type="success" @click="submitCode">提交</el-button>
@@ -177,8 +183,8 @@
     direction="ltr"
     size="20%"
   >
-    <el-table :data="examinationPaper.examinationPaperProblems" @row-click="toProblemById">
-      <el-table-column property="problem.title" align="center" label="题目"  />
+    <el-table :data="testProblems" @row-click="toProblemById">
+      <el-table-column property="title" align="center" label="题目"  />
     </el-table>
   </el-drawer>
 </template>
@@ -257,22 +263,55 @@ export default {
     }
   },
   computed: {
+    testProblems() {
+      if (!this.testExaminationPaper) {
+        return
+      }
+      return this.testExaminationPaper.examinationPaperProblems.map(data=>data.problem)
+    },
+    testExaminationPaper() {
+      if (!this.test) {
+        return
+      }
+      return this.test.examinationPaper
+    },
+    testCountdown() {
+      if (!this.test) {
+        return Date.now()
+      }
+      return Date.parse(this.test.endTime)
+    },
     problemCount() {
-      return this.examinationPaper.examinationPaperProblems.length
+      return this.testProblems.length
     },
     problemIndex() {
-      return this.examinationPaper.examinationPaperProblems.findIndex(p=>{
-        return p.problem.id === this.problem.id
+      return this.testProblems.findIndex(p=>{
+        return p.id === this.problem.id
       })
+    },
+    testStatus() {
+      if (!this.test) {
+        return
+      }
+      return this.checkTestStatus(this.test)
     }
   },
   methods: {
     submitTest() {
+      this.$router.push({
+        path: `test_result/${this.test.id}/detail`,
+      })
+      return
       const testRecord = {
         testId: this.test.id
       }
       saveRecord(testRecord).then(data=>{
-        console.log(data)
+        if (data === false) {
+          ElNotification.error("提交失败")
+        }
+        this.$router.push({
+          path: `test_result/${this.test.id}/detail`,
+        })
       })
     },
     getLabelList() {
@@ -290,18 +329,18 @@ export default {
     },
     toProblemById(row) {
      this.$router.push({
-        path: `/problem/${row.problem.id}`,
-        query: {examId: this.examinationPaper.id}
+        path: `/problem/${row.id}`,
+        query: {examId: this.test.id}
       })
     },
     toProblem(problemIndex) {
       if (problemIndex>this.problemCount || problemIndex < 0) {
         return
       }
-      const problemId = this.examinationPaper.examinationPaperProblems[problemIndex].id
+      const problemId = this.testProblems[problemIndex].id
       this.$router.push({
         path: `/problem/${problemId}`,
-        query: {examId: this.examinationPaper.id}
+        query: {examId: this.test.id}
       })
     },
     submitCode() {
@@ -334,7 +373,7 @@ export default {
     getProblem(callback) {
       let problemId = this.id
       if (!problemId) {
-        problemId = this.examinationPaper.examinationPaperProblems[0].id
+        problemId = this.testProblems[0].id
       }
       getProblemById(problemId).then(data=>{
         this.problem = data.content[0]
@@ -354,9 +393,7 @@ export default {
         getExaminationPaper(this.test.examinationPaper.id).then(epData=>{
           this.examinationPaper = epData.content[0]
           this.getProblem(problemId=>{
-            getAnswerRecords(this.examinationPaper.examinationPaperProblems[0].id,null,this.test.id).then(answerRecordData=>{
-              this.answerRecords = answerRecordData.content
-            })
+            this.answerRecords = this.problem.answerRecords.filter(answerRecord=>answerRecord.testId === this.test.id)
           })
 
         })
@@ -439,11 +476,48 @@ export default {
         log: null,
       }
 
+    },
+    loadData() {
+      const examId = this.$route.query.examId
+      const answrRecordId = this.$route.query.answrRecordId
+      if (answrRecordId) {
+        //已交卷情况
+        getAnswerRecords(null,answrRecordId).then(data=>{
+          this.code = data.content[0].code
+          getTest(data.content[0].testId).then(testData => {
+            this.test = testData.content[0]
+            this.getProblem(problemId=>{
+              getAnswerRecords(problemId).then(answerRecordData=>{
+                this.answerRecords = answerRecordData.content
+              })
+            })
+          })
+        })
+        return
+      }
+      if (examId) {
+        //未交卷情况
+        getTest(examId).then(testData => {
+          this.test = testData.content[0]
+          let outOfDate = null
+          //已交卷情况判断
+          this.checkTestStatus(this.test) === 0 ? outOfDate = examId : outOfDate
+          this.getProblem(problemId=>{
+            getAnswerRecords(problemId,null,outOfDate).then(answerRecordData=>{
+              this.answerRecords = answerRecordData.content
+            })
+          })
+        })
+        return
+      }
+      ElNotification.error("非法情况")
+      this.$router.back(1)
     }
   },
   mounted() {
-    this.getExaminationPaper()
-    this.getAnswerRecord()
+    this.loadData()
+    // this.getExaminationPaper()
+    // this.getAnswerRecord()
     this.getLanguageList()
     this.getLabelList()
     window.addEventListener('resize', debounce(() => {
@@ -458,7 +532,8 @@ export default {
       (toParams, previousParams) => {
         // 对路由变化做出响应...
         this.clearData()
-        this.getExaminationPaper()
+        // this.getExaminationPaper()
+        this.loadData()
       }
     )
   }
