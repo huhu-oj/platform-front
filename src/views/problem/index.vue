@@ -448,10 +448,10 @@ export default {
     },
     loadData() {
       const examId = this.$route.query.examId
-      const answrRecordId = this.$route.query.answrRecordId
-      if (answrRecordId) {
+      const answerRecordId = this.$route.query.answerRecordId
+      if (answerRecordId) {
         //已交卷情况
-        getAnswerRecords(null,answrRecordId).then(data=>{
+        getAnswerRecords(null,answerRecordId).then(data=>{
           this.code = data.content[0].code
           getTest(data.content[0].testId).then(testData => {
             this.test = testData.content[0]
