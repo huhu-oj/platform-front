@@ -91,7 +91,7 @@ export default {
         this.loading = true
         this.$store.dispatch('Login', this.form).then(() => {
           this.loading = false
-          this.$router.push({ path: this.redirect || '/' })
+          this.$router.push({ path: this.$route.query.redirect || '/' })
         }).catch(() => {
           this.loading = false
           this.refreshCode()

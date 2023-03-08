@@ -470,7 +470,10 @@ export default {
           this.test = testData.content[0]
           let outOfDate = null
           //已交卷情况判断
-          this.checkTestStatus(this.test) === 0 ? outOfDate = examId : this.checkSubmitTest()
+          if (this.checkTestStatus(this.test) === 0) {
+            outOfDate = examId
+            this.checkSubmitTest()
+          }
           this.getProblem(problemId=>{
             getAnswerRecords(problemId,null,outOfDate).then(answerRecordData=>{
               this.answerRecords = answerRecordData.content
@@ -483,7 +486,7 @@ export default {
       this.$router.back(1)
     },
     checkSubmitTest() {
-      getRecord().then(data=>{
+      getRecord(this.test.id).then(data=>{
         if (data) {
           ElNotification.warning("你已经完成过作答")
           this.$router.back(1)
@@ -493,8 +496,6 @@ export default {
   },
   mounted() {
     this.loadData()
-    // this.getExaminationPaper()
-    // this.getAnswerRecord()
     this.getLanguageList()
     this.getLabelList()
     window.addEventListener('resize', debounce(() => {
