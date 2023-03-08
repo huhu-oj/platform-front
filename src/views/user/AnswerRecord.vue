@@ -17,7 +17,7 @@
           <el-table-column prop="submitCount" type="expand">
             <template #default="props">
               <el-table :data="props.row.records">
-                <el-table-column prop="id" label="编号"/>
+                <el-table-column prop="executeResult.name" label="状态"/>
                 <el-table-column prop="createTime" label="创建时间"/>
                 <el-table-column prop="language.name" label="语言"/>
                 <el-table-column label="操作">

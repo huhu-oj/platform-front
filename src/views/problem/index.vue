@@ -4,7 +4,7 @@
       <navbar>
         <template #center v-if="testStatus === 0">
           <div style="display: flex;flex-grow: 1"/>
-          <el-countdown title="离测验结束还有" :value="testCountdown" />
+          <el-countdown title="离测验结束还有" :value="testCountdown" @finish="submitTest" />
           <div style="display: flex;flex-grow: 1"/>
         </template>
       </navbar>
@@ -205,11 +205,10 @@ import 'codemirror/addon/fold/foldcode'
 import 'codemirror/theme/dracula.css';
 
 import {get as getLanguageList} from '@/api/language'
-import {get as getTest,saveRecord} from '@/api/test'
+import {get as getTest,saveRecord,getRecord} from '@/api/test'
 import {get as getSolutions,save as saveSolution} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
-import {get as getExaminationPaper } from '@/api/examinationPaper'
 import {get as getLabelList} from '@/api/label'
 import {judge, test} from "@/api/judge";
 import {ElNotification} from "element-plus";
@@ -246,7 +245,6 @@ export default {
       languageList: [],
       labelList: [],
       problem: {},
-      examinationPaper: {},
       solution: {},
       test: null,
       problemListVisible: false,
@@ -298,10 +296,10 @@ export default {
   },
   methods: {
     submitTest() {
-      this.$router.push({
-        path: `test_result/${this.test.id}/detail`,
-      })
-      return
+      // this.$router.push({
+      //   path: `test_result/${this.test.id}/detail`,
+      // })
+      // return
       const testRecord = {
         testId: this.test.id
       }
@@ -380,26 +378,6 @@ export default {
         callback(problemId)
       })
     },
-    getExaminationPaper() {
-      const examId = this.$route.query.examId
-      if (!examId) {
-        this.getProblem(()=>{
-          this.getAnswerRecords()
-        })
-        return
-      }
-      getTest(examId).then(data=>{
-        this.test = data.content[0]
-        getExaminationPaper(this.test.examinationPaper.id).then(epData=>{
-          this.examinationPaper = epData.content[0]
-          this.getProblem(problemId=>{
-            this.answerRecords = this.problem.answerRecords.filter(answerRecord=>answerRecord.testId === this.test.id)
-          })
-
-        })
-      })
-
-    },
     getLanguageList() {
       getLanguageList().then(data=>{
         this.languageList = data.content
@@ -411,21 +389,9 @@ export default {
       })
     },
     getAnswerRecords() {
-      // this.checkTestStatus(this.test)
       getAnswerRecords(this.test.id, this.problem.id).then(data=>{
         this.answerRecords = data.content
       })
-    },
-    getAnswerRecord() {
-      if (!this.$route.query.answerRecordId) {
-        return
-      }
-        getAnswerRecords(null,this.$route.query.answerRecordId).then(data=>{
-          this.code = data.content[0].code
-          getTest(data.content[0].testId).then(testData => {
-            this.test = testData.content[0]
-          })
-        })
     },
     showSolution(item) {
       this.solutionDetail = item
@@ -504,7 +470,7 @@ export default {
           this.test = testData.content[0]
           let outOfDate = null
           //已交卷情况判断
-          this.checkTestStatus(this.test) === 0 ? outOfDate = examId : outOfDate
+          this.checkTestStatus(this.test) === 0 ? outOfDate = examId : this.checkSubmitTest()
           this.getProblem(problemId=>{
             getAnswerRecords(problemId,null,outOfDate).then(answerRecordData=>{
               this.answerRecords = answerRecordData.content
@@ -515,7 +481,15 @@ export default {
       }
       ElNotification.error("非法情况")
       this.$router.back(1)
-    }
+    },
+    checkSubmitTest() {
+      getRecord().then(data=>{
+        if (data) {
+          ElNotification.warning("你已经完成过作答")
+          this.$router.back(1)
+        }
+      })
+    },
   },
   mounted() {
     this.loadData()

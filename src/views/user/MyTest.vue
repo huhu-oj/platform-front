@@ -61,9 +61,9 @@
 <!--                inactive-color="#F56C6C"-->
 <!--                @change="changeEnabled(scope.row, scope.row.enabled)"-->
 <!--            />-->
-            <span v-if="checkTestStatus(scope.row) === -1">未开始</span>
-            <span v-if="checkTestStatus(scope.row) === 0">进行中</span>
-            <span v-if="checkTestStatus(scope.row) === 1">已结束</span>
+            <el-tag type="success" v-if="checkTestStatus(scope.row) === -1">未开始</el-tag>
+            <el-tag v-if="checkTestStatus(scope.row) === 0">进行中</el-tag>
+            <el-tag type="info" v-if="checkTestStatus(scope.row) === 1">已结束</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -77,7 +77,7 @@
              </el-popconfirm>
             <el-popconfirm title="确认结束当前测验" @confirm="endTest(scope.row)">
               <template #reference>
-                <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >立即结束</el-button>
+                <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >结束</el-button>
               </template>
             </el-popconfirm>
           </template>

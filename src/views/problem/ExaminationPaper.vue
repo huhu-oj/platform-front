@@ -38,8 +38,10 @@
 
 <script>
 import navbar from "@/components/navbar";
-import {get as getTest} from '@/api/test'
+import {get as getTest,getRecord} from '@/api/test'
 import { mavonEditor } from 'mavon-editor'
+import { ElNotification } from "element-plus";
+
 export default {
   name: "ExaminationPaper",
   components: {
