@@ -72,10 +72,14 @@
              <el-popconfirm title="确认删除" @confirm="delTest(scope.row)">
                <template #reference>
                  <el-button v-if="checkTestStatus(scope.row) === -1" size="small" type="danger" >删除</el-button>
-                 <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >立即结束</el-button>
                  <el-button v-if="checkTestStatus(scope.row) === 1" :disabled="checkTestStatus(scope.row) === 1" size="small" type="danger" >删除</el-button>
                </template>
              </el-popconfirm>
+            <el-popconfirm title="确认结束当前测验" @confirm="endTest(scope.row)">
+              <template #reference>
+                <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >立即结束</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -135,6 +139,9 @@ export default {
   },
   methods: {
     checkTestStatus(test) {
+      if (!test.enabled) {
+        return 1
+      }
       const currentTime = Date.parse(new Date())
       const startTime = Date.parse(test.startTime)
       const endTime = Date.parse(test.endTime)
@@ -169,10 +176,16 @@ export default {
     },
     delTest(row) {
       delTest(row.id).then(data=>{
-
         ElNotification.success({
           title: "删除测验成功"
         })
+        this.getMyTests()
+      })
+    },
+    endTest(row) {
+      row.enabled = false
+      updateTest(row).then(data=>{
+        ElNotification.success("已结束当前测验")
         this.getMyTests()
       })
     },

@@ -20,17 +20,12 @@
               :toolbarsFlag="false"
               :boxShadow="false"
           />
-
-          <div v-if="step+1 === 1">
-            <span>测验未开始</span>
+          <div >
+            <span v-if="step+1 === 1">测验未开始</span>
+            <el-button v-if="step+1 === 2" @click="toProblem">进入测验</el-button>
+            <el-button v-if="step+1 === 3" @click="toProblem">查看题目</el-button>
           </div>
-          <div v-if="step+1 === 2">
-            <el-button @click="toProblem">进入测验</el-button>
-          </div>
-          <div v-if="step+1 === 3">
-            <el-button @click="toProblem">查看题目</el-button>
-          </div>
-          <el-button @click="step++">下一阶段</el-button>
+<!--          <el-button @click="step++">下一阶段</el-button>-->
         </el-col>
       </el-row>
     </el-main>
@@ -62,6 +57,10 @@ export default {
       getTest(this.id).then(data=>{
         this.test = data.content[0]
         //判断阶段
+        if (!this.test.enabled) {
+          this.step = 2
+          return
+        }
         const currentTime = Date.parse(new Date())
         const startTime = Date.parse(this.test.startTime)
         const endTime = Date.parse(this.test.endTime)

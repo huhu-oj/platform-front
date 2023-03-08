@@ -444,6 +444,9 @@ export default {
       this.judgeTest()
     },
     checkTestStatus(test) {
+      if (!test.enabled) {
+        return 1
+      }
       const currentTime = Date.parse(new Date())
       const startTime = Date.parse(test.startTime)
       const endTime = Date.parse(test.endTime)
