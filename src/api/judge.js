@@ -7,12 +7,10 @@ export function judge(data) {
         data
     })
 }
-export function test(code,input) {
+export function test(data) {
     return request({
         url: '/api/judge/test',
         method: 'post',
-        params: {
-            code,input
-        }
+        data
     })
 }

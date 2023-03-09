@@ -360,7 +360,12 @@ export default {
       })
     },
     judgeTest() {
-      test(this.code,this.codeConsole.testCase).then(data=>{
+      let answerRecordToJudge = {
+        code: this.code,
+        languageId: this.languageId,
+        input: this.codeConsole.testCase
+      }
+      test(answerRecordToJudge).then(data=>{
 
         this.codeConsole.error = data.error
         this.codeConsole.log = data.log
