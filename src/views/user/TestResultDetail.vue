@@ -119,7 +119,7 @@ export default {
   methods: {
     getTestResult() {
       getRecord(this.id).then(data=>{
-        data.testJsonStr = JSON.parse(data.testJsonStr)
+        data.testJsonStr = JSON.parse(data.testJsonStr || {})
         this.testResult = data
       })
     },
@@ -130,7 +130,7 @@ export default {
         //统计
         const problems = this.test.examinationPaper.examinationPaperProblems
         this.option.xAxis.data = problems.map(p=>p.problem.title)
-        this.option.dataset.dimensions= problems.map(p=>p.problem.title)
+        // this.option.dataset.dimensions= problems.map(p=>p.problem.title)
         const data0 = [
           {}
         ]

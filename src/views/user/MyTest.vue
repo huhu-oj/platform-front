@@ -47,20 +47,14 @@
       <el-button @click="addTest">添加</el-button>
     </el-header>
     <el-main>
-      <el-button @click="manager = !manager">管理</el-button>
-      <el-table v-if="manager" :data="tests">
+<!--      <el-button @click="manager = !manager">管理</el-button>-->
+      <el-table v-if="roles.indexOf('teacher') !== -1" :data="tests">
         <el-table-column prop="title" label="测验名称"/>
         <el-table-column prop="examinationPaper.name" label="使用试卷"/>
         <el-table-column prop="startTime" label="开始时间"/>
         <el-table-column prop="endTime" label="结束时间"/>
         <el-table-column prop="enabled" label="状态">
           <template #default="scope">
-<!--            <el-switch-->
-<!--                v-model="scope.row.enabled"-->
-<!--                active-color="#409EFF"-->
-<!--                inactive-color="#F56C6C"-->
-<!--                @change="changeEnabled(scope.row, scope.row.enabled)"-->
-<!--            />-->
             <el-tag type="success" v-if="checkTestStatus(scope.row) === -1">未开始</el-tag>
             <el-tag v-if="checkTestStatus(scope.row) === 0">进行中</el-tag>
             <el-tag type="info" v-if="checkTestStatus(scope.row) === 1">已结束</el-tag>
@@ -83,14 +77,18 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-if="tests.length !== 0">
-        <el-card v-for="item in tests" class="test" @click="toExaminationPaper(item.id)">
-          <span>{{item.title}}</span>
-        </el-card>
+      <div v-if="roles.indexOf('student') !== -1">
+        <div v-if="tests.length !== 0">
+          <el-card v-for="item in tests" class="test" @click="toExaminationPaper(item.id)">
+            <span>{{item.title}}</span>
+          </el-card>
+        </div>
+        <div v-else >
+          <span style="height: 200px;display: flex;flex-direction: column;justify-content: center;align-items: center">暂无测验</span>
+        </div>
       </div>
-      <div v-else >
-        <span style="height: 200px;display: flex;flex-direction: column;justify-content: center;align-items: center">暂无测验</span>
-      </div>
+
+
     </el-main>
   </el-container>
 
@@ -102,9 +100,14 @@ import {get as getMyTests,save as saveTest, update as updateTest, del as delTest
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
 import {ElNotification} from "element-plus";
-
+import { mapGetters } from 'vuex'
 export default {
   name: "MyTest",
+  computed: {
+    ...mapGetters([
+        "roles"
+    ])
+  },
   data() {
     return {
       manager: false,
