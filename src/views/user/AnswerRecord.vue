@@ -29,10 +29,11 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination layout="prev, pager, next" :total="50"/>
+<!--        <el-pagination layout="prev, pager, next" :total="50"/>-->
       </el-col>
       <el-col :span="6">
-        <div ref="answerRecordStatChart" style="width: 100%;height: 400px"></div>
+        <v-chart :option="answerRecordStat" class="chart" autoresize />
+<!--        <div ref="answerRecordStatChart" style="width: 100%;height: 400px"></div>-->
       </el-col>
     </el-row>
 
@@ -40,12 +41,18 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
-import { debounce } from '@/utils'
+// import * as echarts from 'echarts';
+import "core-js/actual/array/group-by";
+import VChart from 'vue-echarts'
+import 'echarts'
+import {uniqueObjArray } from '@/utils'
 import {get as getExecuteResultList} from '@/api/executeResult'
-import {get as getAnswerRecords} from '@/api/answerRecord'
+import {getAll as getAllAnswerRecords} from '@/api/answerRecord'
 export default {
   name: "AnswerRecord",
+  components: {
+    VChart,
+  },
   data() {
     return {
       executeResultId: null,
@@ -54,105 +61,71 @@ export default {
       answerRecordStat: {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)'
+          formatter: '{a} <br/>{b} : {c} ({d}%)',
         },
         legend: {
-          // orient: 'vertical',
-          type: 'scroll',
-          top: 0,
-          // bottom: 0
+          orient: 'vertical',
+          left: 'left',
+          data: {},
         },
         dataset: [
-          {
-            source: [
-              { value: 1548, name: '数组' },
-              { value: 775, name: '二叉树' },
-              { value: 679, name: '动态规划' }
-            ]
-          },
-          {
-            source: [
-              { value: 1548, name: '量子力学' },
-              { value: 1775, name: '动态规划' },
-              { value: 679, name: '九宫格' }
-            ]
-          },
-          {
-            source: [
-              { value: 10, name: 'python' },
-              { value: 20, name: 'java' },
-              { value: 20, name: 'go' }
-            ]
-          },
-          {
-            source: [
-              { value: 5, name: '已通过' },
-              { value: 10, name: '未通过' }
-            ]
-          },
+          { source: [ ] },
+          { source: [ ] },
+          { source: [ ] },
+          { source: [ ] }
         ],
         series: [
           {
-            name: '标签',
-            type: 'pie',
-            selectedMode: 'single',
-            radius: [0, '24%'],
-            label: {
-              show: false
-            },
-            labelLine: {
-              show: false
-            },
-            encode: {
-              itemName: 'name',
-              tooltip: '{a} <br/>{b}: {@value} ({d}%)'
-            },
-            datasetIndex: 0
-          },
-          {
-            name: '知识点',
-            type: 'pie',
-            selectedMode: 'single',
-            radius: ['25%', '49%'],
-            label: {
-              show: false
-            },
-            labelLine: {
-              show: false
-            },
-            datasetIndex: 1
-
-          },
-          {
-            name: '语言',
-            type: 'pie',
-            radius: ['50%', '74%'],
-            labelLine: {
-              length: 30
-            },
-            label: {
-              show: false
-            },
-            datasetIndex: 2
-
-          },
-          {
+            datasetIndex: 0,
             name: '题目',
             type: 'pie',
-            radius: ['75%', '95%'],
+            radius: ['75%','95%'],
             labelLine: {
-              length: 30
+              show: false
             },
             label: {
               show: false
             },
-            datasetIndex: 3
-
           },
-
-        ]
-      },
-      chart: null
+          {
+            datasetIndex: 1,
+            name: '语言',
+            type: 'pie',
+            radius: ['50%','74%'],
+            labelLine: {
+              show: false
+            },
+            label: {
+              show: false
+            },
+          },
+          {
+            datasetIndex: 2,
+            name: '标签',
+            type: 'pie',
+            radius: ['25%','49%'],
+            labelLine: {
+              show: false
+            },
+            label: {
+              show: false
+            },
+          },
+          {
+            datasetIndex: 3,
+            name: '判题结果',
+            type: 'pie',
+            radius: [0,'24%'],
+            labelLine: {
+              show: false
+            },
+            label: {
+              show: false
+            },
+          }
+        ],
+      }
+      // chart: null
     }
   },
   methods: {
@@ -162,17 +135,10 @@ export default {
       })
     },
     getAnswerRecords() {
-      getAnswerRecords().then(data=>{
-        let content = data.content
-        console.log(content)
+      getAllAnswerRecords().then(data=>{
+        let content = data
         let result = []
-
-        const uniqueFunc = (arr, uniId)=>{
-          const res = new Map();
-          return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
-        }
-
-        let problems = uniqueFunc(content.map(ar=>ar.problem),'id')
+        let problems = uniqueObjArray(content.map(ar=>ar.problem),'id')
         problems.forEach(problem=>{
           let records = content.filter(ar=>ar.problem.id === problem.id)
           result.push({
@@ -180,19 +146,51 @@ export default {
             records
           })
         })
-
         this.answerRecords = result
+        //统计通过未通过的题目
+        const acProblemCount = uniqueObjArray(content.filter(ar=>ar.executeResult.id === 1).map(ar=>ar.problem),'id').length
+        const unacProblemCount = uniqueObjArray(content.map(ar=>ar.problem),'id').length - acProblemCount
+        const data0 = [
+          {name: '已通过', value: acProblemCount},
+          {name: '未通过', value: unacProblemCount},
+        ]
+        const data1 = []
+        const languageGroup = content.groupBy(ar => ar.language.name)
+        for (let language in languageGroup) {
+          data1.push({
+            name: language,
+            value: languageGroup[language].length
+          })
+        }
+        const data2 = []
+        let labels = []
+        content.map(ar=>ar.problem.labels).map(l=>labels = labels.concat(l))
+        const labelGroup = labels.groupBy(l => l.name)
+        for (let label in labelGroup) {
+          data2.push({
+            name: label,
+            value: labelGroup[label].length
+          })
+        }
+
+        const data3 = []
+        const executeResultGroup = content.groupBy(ar => ar.executeResult.name)
+        for (let er in executeResultGroup ) {
+          data3.push({
+            name: er,
+            value: executeResultGroup[er].length
+          })
+        }
+        //统计
+        this.answerRecordStat.dataset[0].source = data0
+        this.answerRecordStat.dataset[1].source = data1
+        this.answerRecordStat.dataset[2].source = data2
+        this.answerRecordStat.dataset[3].source = data3
       })
     }
   },
   mounted() {
-    this.chart = echarts.init(this.$refs.answerRecordStatChart)
-    this.chart.setOption(this.answerRecordStat)
-    window.addEventListener('resize', debounce(() => {
-      if (this.chart) {
-        this.chart.resize()
-      }
-    }, 100))
+
   },
   created() {
     this.getExecuteResultList()
@@ -202,5 +200,7 @@ export default {
 </script>
 
 <style scoped>
-
+.chart {
+  height: 100vh;
+}
 </style>

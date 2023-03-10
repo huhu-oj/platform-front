@@ -1,7 +1,7 @@
 <template>
   <div style="height: calc(100vh - 190px)">
     <el-scrollbar>
-      <h1 >{{ solution.problem.title }}</h1>
+      <h1 >{{ solution.title }}</h1>
       <el-space wrap>
         <el-tag v-for="item in solution.labels">{{item.name}}</el-tag>
       </el-space>

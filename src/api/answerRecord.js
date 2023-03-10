@@ -18,3 +18,13 @@ export function getForTeacher(problemId,studentId) {
         }
     })
 }
+
+export function getAll(problemId,answerRecordId,testId) {
+    return request({
+        url: '/api/answerRecord/all',
+        method: 'get',
+        params: {
+            problemId,answerRecordId,testId
+        }
+    })
+}

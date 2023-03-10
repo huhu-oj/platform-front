@@ -386,3 +386,7 @@ export function downloadFile(obj, name, suffix) {
   link.click()
   document.body.removeChild(link)
 }
+export function uniqueObjArray(arr, uniId){
+  const res = new Map();
+  return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
+}
