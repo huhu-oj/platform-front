@@ -66,7 +66,7 @@ export default {
         legend: {
           orient: 'vertical',
           left: 'left',
-          data: {},
+          // data: {},
         },
         dataset: [
           { source: [ ] },
