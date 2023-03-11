@@ -41,7 +41,6 @@
 </template>
 
 <script>
-// import * as echarts from 'echarts';
 import "core-js/actual/array/group-by";
 import VChart from 'vue-echarts'
 import 'echarts'

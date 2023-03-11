@@ -308,7 +308,7 @@ export default {
           ElNotification.error("提交失败")
         }
         this.$router.push({
-          path: `test_result/${this.test.id}/detail`,
+          path: `/test_result/${this.test.id}/detail`,
         })
       })
     },
