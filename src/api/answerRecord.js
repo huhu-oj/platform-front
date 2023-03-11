@@ -19,12 +19,15 @@ export function getForTeacher(problemId,studentId) {
     })
 }
 
-export function getAll(problemId,answerRecordId,testId) {
+export function getAll(problemId,answerRecordId,testId,labelIds) {
+    let params = new URLSearchParams()
+    problemId &&params.append('problemId',problemId)
+    answerRecordId && params.append('answerRecordId',answerRecordId)
+    testId &&params.append('testId',testId)
+    labelIds && params.append('labelIds', labelIds)
     return request({
         url: '/api/answerRecord/all',
         method: 'get',
-        params: {
-            problemId,answerRecordId,testId
-        }
+        params
     })
 }

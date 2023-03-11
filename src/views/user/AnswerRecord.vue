@@ -3,11 +3,12 @@
     <el-row>
       <el-col :span="18">
         <div style="display: flex">
-          <el-select v-model="executeResultId">
-            <el-option v-for="item in executeResultList"
+          <el-select v-model="labelIds" @change="search" multiple>
+            <el-option v-for="item in labelList"
                        :key="item.id"
                        :label="item.name"
-                       :value="item.id"/>
+                       :value="item.id"
+            />
           </el-select>
           <el-input ></el-input>
         </div>
@@ -45,7 +46,7 @@ import "core-js/actual/array/group-by";
 import VChart from 'vue-echarts'
 import 'echarts'
 import {uniqueObjArray } from '@/utils'
-import {get as getExecuteResultList} from '@/api/executeResult'
+import {get as getLabelList} from '@/api/label'
 import {getAll as getAllAnswerRecords} from '@/api/answerRecord'
 export default {
   name: "AnswerRecord",
@@ -54,8 +55,8 @@ export default {
   },
   data() {
     return {
-      executeResultId: null,
-      executeResultList: [],
+      labelIds: [],
+      labelList: [],
       answerRecords: [],
       answerRecordStat: {
         tooltip: {
@@ -128,13 +129,17 @@ export default {
     }
   },
   methods: {
-    getExecuteResultList() {
-      getExecuteResultList().then(data=>{
-        this.executeResultList = data.content
+    search() {
+      this.getAnswerRecords(null,null,null,this.labelIds)
+    },
+    getLabelList() {
+      getLabelList().then(data=>{
+        console.log(data)
+        this.labelList = data
       })
     },
-    getAnswerRecords() {
-      getAllAnswerRecords().then(data=>{
+    getAnswerRecords(problemId,answerRecordId,testId,labelIds) {
+      getAllAnswerRecords(problemId,answerRecordId,testId,labelIds).then(data=>{
         let content = data
         let result = []
         let problems = uniqueObjArray(content.map(ar=>ar.problem),'id')
@@ -192,7 +197,7 @@ export default {
 
   },
   created() {
-    this.getExecuteResultList()
+    this.getLabelList()
     this.getAnswerRecords()
   }
 }

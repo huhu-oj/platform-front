@@ -38,7 +38,7 @@
             </el-tab-pane>
             <el-tab-pane label="题解" name="solution" v-if="testStatus === 1" style="height: calc(100vh - 231px)">
               <el-scrollbar>
-                <solution :problemId="problem.id" @show-detail="showSolution"/>
+                <solution :problemId="problem.id" @show-detail="showSolution" :refresh="solutionKey"/>
               </el-scrollbar>
               <el-button type="primary" circle size="large" style="position:absolute; bottom: 10px; right: 10px" @click="rightSideVisible = 'solutionAdd'">
                 <template #icon><Plus/></template>
@@ -246,6 +246,7 @@ export default {
       labelList: [],
       problem: {},
       solution: {},
+      solutionKey: 0,
       test: null,
       problemListVisible: false,
       code: ``,
@@ -320,7 +321,7 @@ export default {
     addSolution() {
       this.solution.problem = this.problem
       saveSolution(this.solution).then(data=>{
-        this.getSolutions()
+        this.solutionKey++
         this.showSolution(data)
         this.rightSideVisible = 'solutionDetail'
       })
@@ -390,6 +391,7 @@ export default {
     },
     getSolutions() {
       getSolutions(this.problem.id).then(data=>{
+        console.log(data)
         this.solutions = data
       })
     },
@@ -439,8 +441,8 @@ export default {
      this.solutionDetail = {}
      this.rightSideVisible = 'codeEdit'
      this.height = document.documentElement.clientHeight - 240
-     this.languageId = null
-     this.languageList = []
+     // this.languageId = null
+     // this.languageList = []
      this.problem = {}
      this.examinationPaper = {}
      this.problemListVisible = false

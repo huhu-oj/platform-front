@@ -16,6 +16,11 @@ export default {
     problemId: {
       type: Number,
       required: true
+    },
+    refresh: {
+      type: Number,
+      required: false,
+      default: 1
     }
   },
   emits: ['showDetail'],
@@ -27,7 +32,9 @@ export default {
   watch: {
     //正确给 cData 赋值的 方法
     problemId(newVal,oldVal){
-      console.log(newVal)
+      newVal && this.getSolutions(); //newVal存在的话执行
+    },
+    refresh(newVal) {
       newVal && this.getSolutions(); //newVal存在的话执行
     }
   },
