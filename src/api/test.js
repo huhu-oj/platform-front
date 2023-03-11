@@ -9,6 +9,16 @@ export function get(testId) {
         }
     })
 }
+
+export function getForTeacher(testId) {
+    return request({
+        url: '/api/test/teacher',
+        method: 'get',
+        params: {
+            testId
+        }
+    })
+}
 export function save(data) {
     return request({
         url: '/api/test',

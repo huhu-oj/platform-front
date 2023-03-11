@@ -43,12 +43,12 @@
     </div>
   </el-dialog>
   <el-container>
-    <el-header v-if="manager">
+    <el-header v-if="userRoles.indexOf('老师') !== -1">
       <el-button @click="addTest">添加</el-button>
     </el-header>
     <el-main>
 <!--      <el-button @click="manager = !manager">管理</el-button>-->
-      <el-table v-if="roles.indexOf('teacher') !== -1" :data="tests">
+      <el-table v-if="userRoles.indexOf('老师') !== -1" :data="tests">
         <el-table-column prop="title" label="测验名称"/>
         <el-table-column prop="examinationPaper.name" label="使用试卷"/>
         <el-table-column prop="startTime" label="开始时间"/>
@@ -77,7 +77,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-if="roles.indexOf('student') !== -1">
+      <div v-if="userRoles.indexOf('学生') !== -1">
         <div v-if="tests.length !== 0">
           <el-card v-for="item in tests" class="test" @click="toExaminationPaper(item.id)">
             <span>{{item.title}}</span>
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import {get as getMyTests,save as saveTest, update as updateTest, del as delTest} from '@/api/test'
+import {get as getMyTests,getForTeacher, save as saveTest, update as updateTest, del as delTest} from '@/api/test'
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
 import {ElNotification} from "element-plus";
@@ -105,7 +105,7 @@ export default {
   name: "MyTest",
   computed: {
     ...mapGetters([
-        "roles"
+        "roles","userRoles"
     ])
   },
   data() {
@@ -162,9 +162,17 @@ export default {
       })
     },
     getMyTests() {
-      getMyTests().then(data=>{
-        this.tests = data.content
-      })
+      if (this.userRoles.indexOf('老师') !== -1) {
+        getForTeacher().then(data=>{
+          this.tests = data.content
+        })
+      }
+      if (this.userRoles.indexOf('学生') !== -1) {
+        console.log(this.userRoles)
+        getMyTests().then(data=>{
+          this.tests = data.content
+        })
+      }
     },
     addTest() {
       this.formTitle = '新增'

@@ -6,6 +6,7 @@ const user = {
     token: getToken(),
     user: {},
     roles: [],
+    userRoles: [],
   },
 
   mutations: {
@@ -17,6 +18,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_USER_ROLES: (state, roles) => {
+      state.userRoles = roles
     },
   },
 
@@ -43,7 +47,6 @@ const user = {
     },
     // 登出
     LogOut({ commit }) {
-      console.log(1234)
       return new Promise((resolve, reject) => {
         logout().then(res => {
           logOut(commit)
@@ -70,6 +73,12 @@ export const setUserInfo = (res, commit) => {
     commit('SET_ROLES', ['ROLE_SYSTEM_DEFAULT'])
   } else {
     commit('SET_ROLES', res.roles)
+  }
+  console.log(res.user.roles)
+  if (res.user.roles.length === 0) {
+    commit('SET_USER_ROLES', ['ROLE_SYSTEM_DEFAULT'])
+  } else {
+    commit('SET_USER_ROLES', res.user.roles.map(role=>role.name))
   }
   commit('SET_USER', res.user)
 }
