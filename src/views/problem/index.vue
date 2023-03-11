@@ -332,7 +332,7 @@ export default {
       })
     },
     toProblem(problemIndex) {
-      if (problemIndex>this.problemCount || problemIndex < 0) {
+      if (problemIndex>=this.problemCount || problemIndex < 0) {
         return
       }
       const problemId = this.testProblems[problemIndex].id
@@ -394,8 +394,13 @@ export default {
       })
     },
     getAnswerRecords() {
-      getAnswerRecords(this.test.id, this.problem.id).then(data=>{
-        this.answerRecords = data.content
+      let outOfDate = null
+      if (this.checkTestStatus(this.test) === 0) {
+            outOfDate = this.test.id
+            this.checkSubmitTest()
+      }
+      getAnswerRecords(this.problem.id,null,outOfDate).then(answerRecordData=>{
+        this.answerRecords = answerRecordData.content
       })
     },
     showSolution(item) {
