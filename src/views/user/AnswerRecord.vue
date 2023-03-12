@@ -134,7 +134,6 @@ export default {
     },
     getLabelList() {
       getLabelList().then(data=>{
-        console.log(data)
         this.labelList = data
       })
     },

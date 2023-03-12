@@ -6,18 +6,20 @@ import problem from "@/views/problem"
 import answerRecordDetail from "@/views/user/AnswerRecordDetail.vue";
 import loginView from "@/views/LoginView.vue";
 import examinationPaper from "@/views/problem/ExaminationPaper";
-
+import error401 from '@/views/features/401'
+import error404 from '@/views/features/404'
 
 import store from '@/store'
 import Config from '@/settings'
-import NProgress from 'nprogress' // progress bar
-import 'nprogress/nprogress.css'// progress bar style
-import { getToken } from '@/utils/auth'
-import testResultDetail from "@/views/user/TestResultDetail.vue"; // getToken from cookie
+
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'// progress bar
+import { getToken } from '@/utils/auth'// getToken from cookie
+import testResultDetail from "@/views/user/TestResultDetail.vue";
 
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
-const whiteList = ['/login']// no redirect whitelist
+const whiteList = ['/login','/404','/401']// no redirect whitelist
 const routes = [
   {
     path: '/',
@@ -67,6 +69,22 @@ const routes = [
     path: '/login',
     component: loginView,
     props: true
+  },
+
+  {
+    path: '/404',
+    component: error404,
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: error401,
+    hidden: true
+  },
+  {
+    path: '/:catchAll(.*)',
+    redirect: '/404',
+    hidden: true
   }
 ]
 const router = createRouter({

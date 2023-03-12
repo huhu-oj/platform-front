@@ -29,14 +29,17 @@
       </el-col>
 
     </el-row>
-    <el-footer class="user-footer">Footer</el-footer>
+    <el-footer class="user-footer" v-if="$store.state.settings.showFooter">
+        <span v-html="$store.state.settings.footerTxt" />
+      <span v-if="$store.state.settings.caseNumber"> ⋅ </span>
+    </el-footer>
   </el-container>
 </template>
 
 <script>
 import userMenu from "@/components/UserMenu/index.vue";
 import navbar from "@/components/navbar/index.vue";
-
+import '@/settings'
 import {mapGetters} from "vuex";
 export default {
   name: 'HomeView',
