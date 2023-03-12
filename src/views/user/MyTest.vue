@@ -18,10 +18,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="开始时间" prop="startTime">
-        <el-date-picker v-model="form.startTime" type="datetime" style="width: 370px;" />
+        <el-date-picker v-model="form.startTime" value-format="YYYY-MM-DD HH:mm:ss" type="datetime" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="结束时间" prop="endTime">
-        <el-date-picker v-model="form.endTime" type="datetime" style="width: 370px;" />
+        <el-date-picker v-model="form.endTime" value-format="YYYY-MM-DD HH:mm:ss" type="datetime" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="关联单位" prop="depts" v-if="formTitle === '新增'">
         <el-tree
@@ -117,6 +117,7 @@
 import {get as getMyTests,getForTeacher, save as saveTest, update as updateTest, del as delTest,getRecords} from '@/api/test'
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
+import {formatTime, parseTime} from '@/utils'
 import {ElNotification} from "element-plus";
 import { mapGetters } from 'vuex'
 export default {
@@ -135,7 +136,7 @@ export default {
       testDetails: [],
       formVisible: false,
       formTitle: '新增',
-      form: { id: null, title: null, description: null, examinationPaper: null, startTime: Date.now(), endTime: null, enabled: true, depts:[] },
+      form: { id: null, title: null, description: null, examinationPaper: null, startTime: parseTime(new Date(),null), endTime: null, enabled: true, depts:[] },
       rules: {
         title: [
           { required: true, message: '标题不能为空', trigger: 'blur' }

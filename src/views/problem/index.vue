@@ -297,10 +297,6 @@ export default {
   },
   methods: {
     submitTest() {
-      // this.$router.push({
-      //   path: `test_result/${this.test.id}/detail`,
-      // })
-      // return
       const testRecord = {
         testId: this.test.id
       }
