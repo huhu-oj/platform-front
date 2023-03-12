@@ -140,10 +140,16 @@ export default {
           //遍历知识点获得权重累加和
          const data1 = knowledgeNames.map(name => {
             const weight = problems.map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).filter(k => k.knowledge.name === name).map(k => k.weight)
-            const rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1).map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).filter(k => k.knowledge.name === name).map(k => k.weight)
+           console.log(problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1).map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b),[[]]));
+           let rightWeight = []
+               try {
+                 rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1).map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).filter(k => k.knowledge.name === name).map(k => k.weight)
+               } catch (e) {
+                 // console.log(e)
+               }
             return {
               knowledgeName: name,
-              '知识点掌握程度': (Math.floor(weight.reduce((a, b) => a + b) / rightWeight.reduce((a, b) => a + b) * 10000) / 100)
+              '知识点掌握程度': (Math.floor(weight.reduce((a, b) => a + b,0) / rightWeight.reduce((a, b) => a + b,0) * 10000) / 100)
             }
           })
 

@@ -4,7 +4,7 @@
       :ellipsis="false"
   >
     <slot name="left"></slot>
-    <div class="vcenter logo">huhuOJ平台</div>
+    <el-link class="vcenter logo" type="plain" :underline="false" href="/">huhuOJ平台</el-link>
     <div class="flex-grow6">
       <slot name="center"/>
     </div>

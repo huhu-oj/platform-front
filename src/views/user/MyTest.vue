@@ -46,6 +46,14 @@
     <el-header v-if="userRoles.indexOf('老师') !== -1">
       <el-button @click="addTest">添加</el-button>
     </el-header>
+
+    <el-header v-if="userRoles.indexOf('学生') !== -1">
+      <el-select v-model="testStatus">
+        <el-option label="未开始" :value="-1"/>
+        <el-option label="进行中" :value="0"/>
+        <el-option label="已结束" :value="1"/>
+      </el-select>
+    </el-header>
     <el-main>
 <!--      <el-button @click="manager = !manager">管理</el-button>-->
       <el-table v-if="userRoles.indexOf('老师') !== -1" :data="tests">
@@ -78,8 +86,8 @@
         </el-table-column>
       </el-table>
       <div v-if="userRoles.indexOf('学生') !== -1">
-        <div v-if="tests.length !== 0">
-          <el-card v-for="item in tests" class="test">
+        <div v-if="tests.length !== 0" v-for="item in tests">
+          <el-card v-show="checkTestStatus(item) === testStatus" class="test">
             <el-row>
               <el-link class="title" @click="toExaminationPaper(item.id)">{{item.title}}</el-link>
               <el-col style="display: flex">
@@ -123,6 +131,7 @@ export default {
     return {
       manager: false,
       tests: [],
+      testStatus: 0,
       testDetails: [],
       formVisible: false,
       formTitle: '新增',
