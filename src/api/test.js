@@ -42,6 +42,13 @@ export function getRecord(testId) {
         }
     })
 }
+
+export function getRecords() {
+    return request({
+        url: '/api/test/records',
+        method: 'get',
+    })
+}
 export function update(data) {
     return request({
         url: '/api/test',

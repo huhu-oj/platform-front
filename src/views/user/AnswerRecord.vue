@@ -61,7 +61,11 @@ export default {
       answerRecordStat: {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)',
+          // formatter: `{a}<br/>{b} : {c} ({d}%)`,
+          formatter: (params) => {
+            const dataItem = params.data;
+            return `${params.seriesName}<br/>${dataItem.name} : ${dataItem.value} (${params.percent}%)`;
+          },
         },
         legend: {
           orient: 'vertical',

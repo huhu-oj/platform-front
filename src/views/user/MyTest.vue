@@ -79,8 +79,18 @@
       </el-table>
       <div v-if="userRoles.indexOf('学生') !== -1">
         <div v-if="tests.length !== 0">
-          <el-card v-for="item in tests" class="test" @click="toExaminationPaper(item.id)">
-            <span>{{item.title}}</span>
+          <el-card v-for="item in tests" class="test">
+            <el-row>
+              <el-link class="title" @click="toExaminationPaper(item.id)">{{item.title}}</el-link>
+              <el-col style="display: flex">
+                <el-tag type="success" v-if="checkTestStatus(item) === -1">未开始</el-tag>
+                <el-tag v-if="checkTestStatus(item) === 0">进行中</el-tag>
+                <el-tag type="info" v-if="checkTestStatus(item) === 1">已结束</el-tag>
+                <div style="flex-grow: 1"/>
+                <el-link :href="`/test_result/${item.id}`" v-if="showTestDetail(item.id)">详情统计</el-link>
+              </el-col>
+            </el-row>
+
           </el-card>
         </div>
         <div v-else >
@@ -96,7 +106,7 @@
 </template>
 
 <script>
-import {get as getMyTests,getForTeacher, save as saveTest, update as updateTest, del as delTest} from '@/api/test'
+import {get as getMyTests,getForTeacher, save as saveTest, update as updateTest, del as delTest,getRecords} from '@/api/test'
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
 import {ElNotification} from "element-plus";
@@ -106,12 +116,14 @@ export default {
   computed: {
     ...mapGetters([
         "roles","userRoles"
-    ])
+    ]),
+
   },
   data() {
     return {
       manager: false,
       tests: [],
+      testDetails: [],
       formVisible: false,
       formTitle: '新增',
       form: { id: null, title: null, description: null, examinationPaper: null, startTime: Date.now(), endTime: null, enabled: true, depts:[] },
@@ -141,6 +153,12 @@ export default {
     }
   },
   methods: {
+    showTestDetail(testId) {
+      if (this.testDetails.length === 0) {
+        return false
+      }
+      return this.testDetails.some(d=>d.testId === testId)
+    },
     checkTestStatus(test) {
       if (!test.enabled) {
         return 1
@@ -173,6 +191,11 @@ export default {
           this.tests = data.content
         })
       }
+    },
+    getMyRecords() {
+      getRecords().then(data=>{
+        this.testDetails = data
+      })
     },
     addTest() {
       this.formTitle = '新增'
@@ -267,6 +290,7 @@ export default {
   },
   mounted() {
     this.getMyTests()
+    this.getMyRecords()
     this.getExaminationPapers()
   }
 }
@@ -275,5 +299,10 @@ export default {
 <style scoped>
 .test {
   margin: 20px auto;
+}
+.title {
+  display: block;
+  font-size: 20px;
+
 }
 </style>

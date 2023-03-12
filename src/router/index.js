@@ -41,7 +41,7 @@ const routes = [
     ]
   },
   {
-    path: '/test_result/:id/detail',
+    path: '/test_result/:id',
     component: testResultDetail,
     props: true
   },
