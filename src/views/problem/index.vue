@@ -67,7 +67,11 @@
         </el-col>
         <el-col v-if="rightSideVisible === 'codeEdit'" :span="12" >
           <div style="display: flex">
-            <el-select v-model="languageId" placeholder="Select">
+            <el-select
+                v-model="languageId"
+                placeholder="Select"
+                @change="changeLanguageTemplate"
+            >
               <el-option
                   v-for="item in languageList"
                   :key="item.id"
@@ -296,6 +300,9 @@ export default {
     }
   },
   methods: {
+    changeLanguageTemplate(languageId) {
+      this.code = this.languageList.filter(language=>language.id === languageId)[0].compileStatement
+    },
     submitTest() {
       const testRecord = {
         testId: this.test.id
