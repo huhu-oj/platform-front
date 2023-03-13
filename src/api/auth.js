@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data) {
     return request({
-        url: 'auth/login',
+        url: `http://${data.addr}/auth/login`,
         method: 'post',
         data
     })
@@ -23,5 +23,11 @@ export function logout() {
     return request({
         url: '/auth/logout',
         method: 'delete',
+    })
+}
+export function getServerAddr() {
+    return request({
+        url: 'auth/addr',
+        method: 'get'
     })
 }

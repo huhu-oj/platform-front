@@ -45,9 +45,10 @@
 <script>
 
 
-import {getCode, login} from "@/api/auth"
+import {getCode, getServerAddr} from "@/api/auth"
 import Cookies from 'js-cookie'
 import {ElNotification} from "element-plus";
+import {encrypt} from "@/utils/rsaEncrypt";
 
 export default {
   props: ['redirect'],
@@ -60,7 +61,7 @@ export default {
         password: '',
         code: '',
         uuid: '',
-
+        addr: '',
       },
       loading: false,
       rules: {
@@ -89,6 +90,8 @@ export default {
           return
         }
         this.loading = true
+        //加密密码
+        this.form.password = encrypt(this.form.password)
         this.$store.dispatch('Login', this.form).then(() => {
           this.loading = false
           this.$router.push({ path: this.$route.query.redirect || '/' })
@@ -122,6 +125,7 @@ export default {
   created() {
     this.refreshCode()
     this.point()
+    getServerAddr().then(data=>this.form.addr = data)
   }
 
 }
