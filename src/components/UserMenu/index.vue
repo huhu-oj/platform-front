@@ -4,7 +4,7 @@
     <el-menu-item index="/answer" v-if="userRoles.indexOf('学生') !== -1">
       <span>做题分析</span>
     </el-menu-item>
-    <el-menu-item index="/answer/teacher" v-if="userRoles.indexOf('老师') !== -1">
+    <el-menu-item index="/teacher/student-analysis" v-if="userRoles.indexOf('老师') !== -1">
       <span>学生做题分析</span>
     </el-menu-item>
     <el-menu-item index="/my-test">
@@ -13,14 +13,14 @@
     <el-menu-item index="/my-solutions">
       <span>我的题解</span>
     </el-menu-item>
-    <el-divider/>
-    <el-menu-item>
-      <span>个人空间</span>
-    </el-menu-item>
-    <el-menu-item index="/test/student" v-if="userRoles.indexOf('学生') !== -1">
-      <span>测验分析</span>
-    </el-menu-item>
-    <el-menu-item index="/test/teacher" v-if="userRoles.indexOf('老师') !== -1">
+<!--    <el-divider/>-->
+<!--    <el-menu-item>-->
+<!--      <span>个人空间</span>-->
+<!--    </el-menu-item>-->
+<!--    <el-menu-item index="/test/student" v-if="userRoles.indexOf('学生') !== -1">-->
+<!--      <span>测验分析</span>-->
+<!--    </el-menu-item>-->
+    <el-menu-item index="/teacher/test-analysis" v-if="userRoles.indexOf('老师') !== -1">
       <span>测验分析</span>
     </el-menu-item>
     <slot name="tail"/>

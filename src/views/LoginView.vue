@@ -29,7 +29,7 @@
               <span v-if="!loading">登 录</span>
               <span v-else>登 录 中...</span>
             </el-button>
-            <el-button @click="resetForm('user')">
+            <el-button @click="resetForm('form')">
               重置
             </el-button>
           </el-form-item>

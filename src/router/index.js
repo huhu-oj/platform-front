@@ -17,6 +17,8 @@ import 'nprogress/nprogress.css'// progress bar
 import { getToken } from '@/utils/auth'// getToken from cookie
 import testResultDetail from "@/views/user/TestResultDetail.vue";
 import SolutionManage from "@/views/solution/SolutionManage.vue";
+import studentAnalysis from "@/views/user/StudentAnalysis.vue";
+import testAnalysis from "@/views/user/TestAnalysis.vue";
 
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
@@ -42,6 +44,14 @@ const routes = [
       {
         path: '/my-solutions',
         component: SolutionManage
+      },
+      {
+        path: '/teacher/student-analysis',
+        component: studentAnalysis
+      },
+      {
+        path: '/teacher/test-analysis',
+        component: testAnalysis
       }
     ]
   },

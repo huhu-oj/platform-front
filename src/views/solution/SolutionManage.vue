@@ -48,6 +48,7 @@
         >{{item.name}}</el-tag>
       </template>
     </el-table-column>
+    <el-table-column prop="problem.title" label="所属题目"/>
     <el-table-column label="操作">
       <template #default="scope">
         <el-button size="small" @click="openCU(scope.row)">修改</el-button>
@@ -99,7 +100,7 @@ export default {
       })
     },
     delSolution() {
-      del(this.form.id).then(data=>{
+      del(this.form.id).then(_ =>{
         ElNotification.success("删除成功")
       })
     },

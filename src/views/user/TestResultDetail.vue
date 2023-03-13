@@ -133,7 +133,7 @@ export default {
           }
         })
         //知识点名称
-        const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).map(k => k.knowledge.name))
+        const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || []).reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
         //回答正确的题目
         const rightProblemTitles = data0.filter(p => p['已通过'] > 0).map(p => p.title)
         //全部题目通过的情况
@@ -168,6 +168,6 @@ export default {
 
 <style scoped>
 .chart {
-  height: 100vh;
+  height: 50vh;
 }
 </style>
