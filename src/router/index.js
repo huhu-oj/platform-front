@@ -16,6 +16,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'// progress bar
 import { getToken } from '@/utils/auth'// getToken from cookie
 import testResultDetail from "@/views/user/TestResultDetail.vue";
+import SolutionManage from "@/views/solution/SolutionManage.vue";
 
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
@@ -37,6 +38,10 @@ const routes = [
       {
         path: 'my-test',
         component: myTest
+      },
+      {
+        path: '/my-solutions',
+        component: SolutionManage
       }
     ]
   },

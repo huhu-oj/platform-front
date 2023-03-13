@@ -10,6 +10,9 @@
     <el-menu-item index="/my-test">
       <span>我的测验</span>
     </el-menu-item>
+    <el-menu-item index="/my-solutions">
+      <span>我的题解</span>
+    </el-menu-item>
     <el-divider/>
     <el-menu-item>
       <span>个人空间</span>
