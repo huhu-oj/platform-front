@@ -6,7 +6,6 @@
 <script>
 import {getForTeacher as getTest} from '@/api/test'
 import VChart from "vue-echarts";
-import "core-js/actual/array/group-by";
 import {uniqueObjArray} from "@/utils";
 export default {
   //如果有给测验id，则显示单场测验的统计，不然实现测验对比

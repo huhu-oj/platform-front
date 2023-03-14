@@ -4,11 +4,13 @@
       <navbar/>
     </el-header>
     <el-main>
+      <div>{{ test.title }}</div>
+      <el-statistic title="测验分数" :value="testResult.score"/>
       <el-row justify="center">
         <el-col :span="12">
-          <div>{{ test.title }}</div>
-          <el-statistic title="测验分数" :value="testResult.score"/>
           <v-chart :option="option" autosize class="chart"/>
+        </el-col>
+        <el-col :span="12">
           <v-chart :option="option1" autosize class="chart"/>
         </el-col>
       </el-row>
@@ -21,8 +23,7 @@ import navbar from "@/components/navbar/index.vue";
 import VChart from "vue-echarts";
 import {getRecord} from "@/api/test";
 
-import "core-js/actual/array/group-by";
-import {uniqueArr, uniqueObjArray} from "@/utils";
+import {uniqueArr} from "@/utils";
 
 export default {
   name: "TestResultDetail",

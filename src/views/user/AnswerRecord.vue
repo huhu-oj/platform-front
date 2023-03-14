@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import "core-js/actual/array/group-by";
 import VChart from 'vue-echarts'
 import 'echarts'
 import {uniqueObjArray } from '@/utils'

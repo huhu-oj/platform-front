@@ -216,7 +216,7 @@ import {get as getAnswerRecords} from '@/api/answerRecord'
 import {get as getLabelList} from '@/api/label'
 import {judge, test} from "@/api/judge";
 import {ElNotification} from "element-plus";
-import {debounce} from "@/utils";
+import {debounce, checkTestStatus} from "@/utils";
 export default {
   components: {
     navbar,solution,solutionDetail,Codemirror,mavonEditor,Edit,Plus
@@ -425,27 +425,13 @@ export default {
       this.judgeTest()
     },
     checkTestStatus(test) {
-      if (!test.enabled) {
-        return 1
-      }
-      const currentTime = Date.parse(new Date())
-      const startTime = Date.parse(test.startTime)
-      const endTime = Date.parse(test.endTime)
-      if (currentTime < startTime) {
-        return -1
-      } else if (currentTime > startTime && currentTime < endTime) {
-        return 0
-      } else {
-        return 1
-      }
+      return checkTestStatus(test)
     },
     clearData() {
      this.leftTab = null
      this.solutionDetail = {}
      this.rightSideVisible = 'codeEdit'
      this.height = document.documentElement.clientHeight - 240
-     // this.languageId = null
-     // this.languageList = []
      this.problem = {}
      this.examinationPaper = {}
      this.problemListVisible = false

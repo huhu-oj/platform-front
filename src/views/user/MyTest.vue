@@ -117,7 +117,7 @@
 import {get as getMyTests,getForTeacher, save as saveTest, update as updateTest, del as delTest,getRecords} from '@/api/test'
 import {getDepts} from "@/api/system/dept";
 import {get as getExaminationPaper} from '@/api/examinationPaper'
-import {formatTime, parseTime} from '@/utils'
+import {checkTestStatus, parseTime} from '@/utils'
 import {ElNotification} from "element-plus";
 import { mapGetters } from 'vuex'
 export default {
@@ -163,26 +163,14 @@ export default {
     }
   },
   methods: {
+    checkTestStatus(data) {
+      return checkTestStatus(data)
+    },
     showTestDetail(testId) {
       if (this.testDetails.length === 0) {
         return false
       }
       return this.testDetails.some(d=>d.testId === testId)
-    },
-    checkTestStatus(test) {
-      if (!test.enabled) {
-        return 1
-      }
-      const currentTime = Date.parse(new Date())
-      const startTime = Date.parse(test.startTime)
-      const endTime = Date.parse(test.endTime)
-      if (currentTime < startTime) {
-        return -1
-      } else if (currentTime > startTime && currentTime < endTime) {
-        return 0
-      } else {
-        return 1
-      }
     },
     toTestAnalysis(row) {
       this.$router.push(`/teacher/test-analysis/${row.id}`)
