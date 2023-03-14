@@ -17,9 +17,9 @@
 <!--    <el-menu-item>-->
 <!--      <span>个人空间</span>-->
 <!--    </el-menu-item>-->
-<!--    <el-menu-item index="/test/student" v-if="userRoles.indexOf('学生') !== -1">-->
-<!--      <span>测验分析</span>-->
-<!--    </el-menu-item>-->
+    <el-menu-item index="/student/career" v-if="userRoles.indexOf('学生') !== -1">
+      <span>个人生涯</span>
+    </el-menu-item>
     <el-menu-item index="/teacher/test-analysis" v-if="userRoles.indexOf('老师') !== -1">
       <span>测验分析</span>
     </el-menu-item>

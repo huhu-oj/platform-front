@@ -19,6 +19,7 @@ import testResultDetail from "@/views/user/TestResultDetail.vue";
 import SolutionManage from "@/views/solution/SolutionManage.vue";
 import studentAnalysis from "@/views/user/StudentAnalysis.vue";
 import testAnalysis from "@/views/user/TestAnalysis.vue";
+import studentCareer from "@/views/user/StudentCareer.vue";
 
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
@@ -44,6 +45,10 @@ const routes = [
       {
         path: '/my-solutions',
         component: SolutionManage
+      },
+      {
+        path: '/student/career',
+        component: studentCareer
       },
       {
         path: '/teacher/student-analysis',

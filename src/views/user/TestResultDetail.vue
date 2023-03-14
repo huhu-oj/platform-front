@@ -133,17 +133,24 @@ export default {
           }
         })
         //知识点名称
-        const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || []).reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
+        const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || [])
+                                                  .reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
         //回答正确的题目
         const rightProblemTitles = data0.filter(p => p['已通过'] > 0).map(p => p.title)
         //全部题目通过的情况
           //遍历知识点获得权重累加和
          const data1 = knowledgeNames.map(name => {
-            const weight = problems.map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).filter(k => k.knowledge.name === name).map(k => k.weight)
-           console.log(problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1).map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b),[[]]));
+            const weight = problems.map(p => p.problem.problemKnowledges)
+                .reduce((a, b) => a.concat(b))
+                .filter(k => k.knowledge.name === name)
+                .map(k => k.weight)
            let rightWeight = []
                try {
-                 rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1).map(p => p.problem.problemKnowledges).reduce((a, b) => a.concat(b)).filter(k => k.knowledge.name === name).map(k => k.weight)
+                 rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1)
+                     .map(p => p.problem.problemKnowledges)
+                     .reduce((a, b) => a.concat(b))
+                     .filter(k => k.knowledge.name === name)
+                     .map(k => k.weight)
                } catch (e) {
                  // console.log(e)
                }
