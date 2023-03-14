@@ -55,8 +55,14 @@ const routes = [
         component: studentAnalysis
       },
       {
+        path: '/teacher/test-analysis/:id',
+        component: testAnalysis,
+        props: true
+      },
+      {
         path: '/teacher/test-analysis',
-        component: testAnalysis
+        component: testAnalysis,
+        props: true
       }
     ]
   },

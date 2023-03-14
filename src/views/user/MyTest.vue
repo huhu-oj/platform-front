@@ -56,7 +56,7 @@
     </el-header>
     <el-main>
 <!--      <el-button @click="manager = !manager">管理</el-button>-->
-      <el-table v-if="userRoles.indexOf('老师') !== -1" :data="tests">
+      <el-table v-if="userRoles.indexOf('老师') !== -1" :data="tests" @row-click="toTestAnalysis">
         <el-table-column prop="title" label="测验名称"/>
         <el-table-column prop="examinationPaper.name" label="使用试卷"/>
         <el-table-column prop="startTime" label="开始时间"/>
@@ -183,6 +183,9 @@ export default {
       } else {
         return 1
       }
+    },
+    toTestAnalysis(row) {
+      this.$router.push(`/teacher/test-analysis/${row.id}`)
     },
     toExaminationPaper(examId) {
       this.$router.push({

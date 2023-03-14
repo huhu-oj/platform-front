@@ -106,8 +106,6 @@ export default {
         })
         console.log(data0)
       }
-
-
       return {
         legend: {},
         tooltip: {},
