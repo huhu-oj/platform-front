@@ -4,7 +4,7 @@
       <navbar/>
     </el-header>
     <el-main>
-      <div>{{ test.title }}</div>
+      <!--      <div>{{ test.title }}</div>-->
       <el-statistic title="测验分数" :value="testResult.score"/>
       <el-row justify="center">
         <el-col :span="12">
@@ -33,20 +33,56 @@ export default {
   props: ['id'],
   computed: {
     test() {
-      return this.testResult.testJsonStr || {}
-    }
-  },
-  data() {
-    return {
-      testResult: {},
-      option: {
+      if (!this.testResult) return
+      return this.testResult.test
+    },
+    examinationPaper() {
+      if (!this.test) return
+      return this.test.examinationPaper
+    },
+    examinationPaperProblems() {
+      if (!this.examinationPaper) return
+      return this.examinationPaper.examinationPaperProblems
+    },
+    problems() {
+      if (!this.examinationPaperProblems) return
+      return this.examinationPaperProblems.map(epp => epp.problem)
+    },
+    answerRecords() {
+      if (!this.test) return
+      return this.test.answerRecords
+    },
+    option() {
+      if (!this.examinationPaperProblems) return
+      if (!this.answerRecords) return
+      //统计
+      const problems = this.examinationPaperProblems
+      const ARGroup = this.answerRecords.groupBy(ar => ar.problem.title)
+      const data0 = problems.map(p => {
+        const title = p.problem.title
+        if (!ARGroup[title]) {
+          return {
+            title,
+            '未通过': 0,
+            '已通过': 0
+          }
+        }
+        const acCount = ARGroup[title].filter(ar => ar.executeResult.id === 1).length
+        const unacCount = ARGroup[title].length - acCount
+        return {
+          title,
+          '未通过': unacCount,
+          '已通过': acCount
+        }
+      })
+      return {
         legend: {},
         tooltip: {},
         dataset: [
           {
             // 提供一份数据。
             dimensions: ['title', '未通过', '已通过'],
-            source: []
+            source: data0
           },
         ],
 
@@ -77,15 +113,49 @@ export default {
             focus: 'series'
           },
         }]
-      },
-      option1: {
+      }
+    },
+    option1() {
+
+      if (!this.examinationPaperProblems) return
+      if (!this.answerRecords) return
+      const problems = this.examinationPaperProblems
+      //知识点名称
+      const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || [])
+          .reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
+      //回答正确的题目
+      const rightProblemTitles = this.problems.map(p => p.title)
+      //全部题目通过的情况
+      //遍历知识点获得权重累加和
+      const data1 = knowledgeNames.map(name => {
+        const weight = problems.map(p => p.problem.problemKnowledges)
+            .reduce((a, b) => a.concat(b))
+            .filter(k => k.knowledge.name === name)
+            .map(k => k.weight)
+        let rightWeight = []
+        try {
+          rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1)
+              .map(p => p.problem.problemKnowledges)
+              .reduce((a, b) => a.concat(b))
+              .filter(k => k.knowledge.name === name)
+              .map(k => k.weight)
+        } catch (e) {
+          // console.log(e)
+        }
+        return {
+          knowledgeName: name,
+          '知识点掌握程度': (Math.floor(weight.reduce((a, b) => a + b, 0) / rightWeight.reduce((a, b) => a + b, 0) * 10000) / 100)
+        }
+      })
+
+      return {
         legend: {},
         tooltip: {},
         dataset: [
           {
             // 提供一份数据。
             dimensions: ['knowledgeName', '知识点掌握程度'],
-            source: [ ]
+            source: data1
           },
         ],
 
@@ -102,68 +172,20 @@ export default {
             formatter: '{value}%'
           }
         }
-      },
+      }
+    }
+  },
+  data() {
+    return {
+      testResult: {},
+
     }
   },
   methods: {
     getTestResult() {
       getRecord(this.id).then(data => {
-        data.testJsonStr = JSON.parse(data.testJsonStr || {})
+        data.test = JSON.parse(data.testJsonStr || {})
         this.testResult = data
-
-        const test = data.testJsonStr
-
-        //统计
-        const problems = test.examinationPaper.examinationPaperProblems
-        const ARGroup = test.answerRecords.groupBy(ar => ar.problem.title)
-        const data0 = problems.map(p => {
-          const title = p.problem.title
-          if (!ARGroup[title]) {
-            return {
-              title,
-              '未通过': 0,
-              '已通过': 0
-            }
-          }
-          const acCount = ARGroup[title].filter(ar => ar.executeResult.id === 1).length
-          const unacCount = ARGroup[title].length - acCount
-          return {
-            title,
-            '未通过': unacCount,
-            '已通过': acCount
-          }
-        })
-        //知识点名称
-        const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || [])
-                                                  .reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
-        //回答正确的题目
-        const rightProblemTitles = data0.filter(p => p['已通过'] > 0).map(p => p.title)
-        //全部题目通过的情况
-          //遍历知识点获得权重累加和
-         const data1 = knowledgeNames.map(name => {
-            const weight = problems.map(p => p.problem.problemKnowledges)
-                .reduce((a, b) => a.concat(b))
-                .filter(k => k.knowledge.name === name)
-                .map(k => k.weight)
-           let rightWeight = []
-               try {
-                 rightWeight = problems.filter(p => rightProblemTitles.indexOf(p.problem.title) !== -1)
-                     .map(p => p.problem.problemKnowledges)
-                     .reduce((a, b) => a.concat(b))
-                     .filter(k => k.knowledge.name === name)
-                     .map(k => k.weight)
-               } catch (e) {
-                 // console.log(e)
-               }
-            return {
-              knowledgeName: name,
-              '知识点掌握程度': (Math.floor(weight.reduce((a, b) => a + b,0) / rightWeight.reduce((a, b) => a + b,0) * 10000) / 100)
-            }
-          })
-
-        console.log(data1)
-        this.option.dataset[0].source = data0
-        this.option1.dataset[0].source = data1
       })
     },
   },
