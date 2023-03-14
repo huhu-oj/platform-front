@@ -1,5 +1,5 @@
 <template>
-<!--单场测验统计-->
+  <!--单场测验统计-->
   <v-chart :option="testData" class="chart"/>
 </template>
 
@@ -7,6 +7,7 @@
 import {getForTeacher as getTest} from '@/api/test'
 import VChart from "vue-echarts";
 import {uniqueObjArray} from "@/utils";
+import WebSocketService from "@/utils/websocket";
 export default {
   //如果有给测验id，则显示单场测验的统计，不然实现测验对比
   name: "TestAnalysis",
@@ -25,7 +26,7 @@ export default {
     },
     problems() {
       if (!this.examinationPaperProblems) return
-      return this.examinationPaperProblems.map(epp=>epp.problem)
+      return this.examinationPaperProblems.map(epp => epp.problem)
     },
     answerRecords() {
       if (!this.test) return
@@ -35,14 +36,14 @@ export default {
       if (!this.answerRecords) return
       //分组answerRecord
       const result = []
-      const ARGroup = this.answerRecords.groupBy(ar=>ar.userId);
+      const ARGroup = this.answerRecords.groupBy(ar => ar.userId);
       Object.entries(ARGroup).forEach(([userId, ar]) => {
         const averageCompletion = this.averageCompletion(ar);
         const averageCorrect = this.averageCorrect(ar);
-        result.push([averageCompletion,averageCorrect])
+        result.push([averageCompletion, averageCorrect])
       })
       console.log(result)
-      return  {
+      return {
         title: [
           {
             text: '学生做题分布情况',
@@ -55,7 +56,7 @@ export default {
             text: '完成率高，正确率高',
             z: 1,
             textAlign: 'right',
-            left: '95%',
+            left: '94%',
             top: '5%',
             textStyle: {
               fontSize: 14,
@@ -66,9 +67,9 @@ export default {
           {
             text: '完成率高，正确率低',
             z: 1,
-            textAlign: 'center',
-            left: '90%',
-            top: '85%',
+            textAlign: 'right',
+            left: '94%',
+            bottom: '8%',
             textStyle: {
               fontSize: 14,
               fontWeight: 'normal',
@@ -78,9 +79,9 @@ export default {
           {
             text: '完成率低，正确率低',
             z: 1,
-            textAlign: 'center',
-            left: '25%',
-            top: '85%',
+            textAlign: 'left',
+            left: '9%',
+            bottom: '8%',
             textStyle: {
               fontSize: 14,
               fontWeight: 'normal',
@@ -90,9 +91,9 @@ export default {
           {
             text: '完成率低，正确率高',
             z: 1,
-            textAlign: 'center',
-            left: '25%',
-            top: '7%',
+            textAlign: 'left',
+            left: '9%',
+            top: '5%',
             textStyle: {
               fontSize: 14,
               fontWeight: 'normal',
@@ -100,127 +101,121 @@ export default {
             },
           },
         ],
-        grid: {
-          top: '10%',
-          left: '3%',
-          right: '7%',
-          bottom: '1%',
-          containLabel: true,
-        },
         tooltip: {
           showDelay: 0,
           formatter: (params) => {
             if (params.value.length > 1) {
-              return `${params.seriesName}:<br/>${(params.value[0]*100).toFixed(2)}%${(params.value[1]*100).toFixed(2)}%`;
+              return `${params.seriesName}:<br/>${(params.value[0]).toFixed(2)}%${(params.value[1]).toFixed(2)}%`;
             }
             return false;
           },
-
         },
-        xAxis: [{
+        xAxis: {
           type: 'value',
           name: '完成率',
-          scale: true,
-          splitLine: {
-            show: false,
+          nameLocation: 'center',
+          nameGap: 25,
+          min: 0,
+          max: 100,
+          splitLine: {show: false}, // 隐藏网格线
+          axisLine: {
+            symbol: ['none', 'arrow'], // 坐标轴箭头样式
+            symbolSize: [6, 15], // 坐标轴箭头大小
+            lineStyle: {
+              color: '#ccc' // 坐标轴颜色
+            },
+            onZero: true // x轴过原点
           },
-          data: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        }],
-        yAxis: [{
+          axisLabel: {
+            show: true, // 显示刻度标签
+            formatter: function (value) { // 自定义坐标轴刻度文本内容
+              return Math.abs(value)
+            }
+          },
+          splitNumber: 10 // 刻度数量
+        },
+        yAxis: {
           type: 'value',
-          scale: true,
           name: '正确率',
-          splitLine: {
-            show: false,
+          nameLocation: 'center',
+          nameGap: 25,
+          min: 0,
+          max: 100,
+          splitLine: {show: false},
+          axisLine: {
+            symbol: ['none', 'arrow'],
+            symbolSize: [6, 15],
+            lineStyle: {
+              color: '#ccc'
+            },
+            onZero: true // y轴过原点
           },
-          max: '1',
-        }],
-        series: [
-          {
-            z: 3,
-            type: 'scatter',
-            symbolSize: 12,
-            itemStyle: {
-              normal: {
-                color: '#EF535C',
-              },
-            },
-            data: result
-          },
-          {
-            name: 'wu',
-            type: 'scatter',
-            data: [[0.5, 0]],
-            itemStyle: {
-              normal: {
-                color: '#999',
-              },
-            },
-            markLine: {
-              data: [
-                {
-                  type: 'average',
-                  name: 'wu',
-                  valueIndex: 0,
-                },
-              ],
-            },
+          axisLabel: {
 
+            show: true,
+            formatter: function (value) {
+              return Math.abs(value)
+            }
           },
-          {
-            name: 'six',
-            type: 'scatter',
-            data: [[0, 0.5]],
-            itemStyle: {
-              normal: {
-                color: '#999',
-              },
-            },
-            markLine: {
-              data: [
-                {
-                  type: 'average',
-                  name: 'six',
-                },
-              ],
-              label: {
-                show: false,
-              },
-            },
-          },
-        ],
-      };
+          splitNumber: 10
+        },
+        series: [{
+          symbolSize: 10,
+          data: result,
+          type: 'scatter'
+        }],
+        grid: {
+          left: '5%',
+          right: '5%',
+          bottom: '5%',
+          top: '5%',
+          containLabel: true,
+          show: true,
+          borderColor: '#ccc'
+        }
+      }
     }
   },
   data() {
     return {
-      test: {}
+      test: {},
+      testClient: null
     }
   },
 
   methods: {
     getTest() {
-      getTest(this.id).then(data=>{
+      getTest(this.id).then(data => {
         this.test = data.content[0]
       })
     },
     averageCompletion(answerRecords) {
       if (!this.problems) return
-        //一场测验的完成率
-        const problemCount = this.problems.length
-        const submitProblemCount = uniqueObjArray(answerRecords.map(ar=>ar.problem),'id').length
-        return submitProblemCount/problemCount
+      //一场测验的完成率
+      const problemCount = this.problems.length
+      const submitProblemCount = uniqueObjArray(answerRecords.map(ar => ar.problem), 'id').length
+      return submitProblemCount / problemCount * 100
     },
     averageCorrect(answerRecords) {
       if (!this.problems) return
-        //一场测验的完成率
-        const problemCount = this.problems.length
-        const correctProblemCount = uniqueObjArray(answerRecords.filter(ar=>ar.executeResult.id === 1).map(ar=>ar.problem),'id').length
-        return correctProblemCount/problemCount
+      //一场测验的正确率
+      const problemCount = this.problems.length
+      const correctProblemCount = uniqueObjArray(answerRecords.filter(ar => ar.executeResult.id === 1).map(ar => ar.problem), 'id').length
+      return correctProblemCount / problemCount * 100
     },
+    listenAnswerRecordChange() {
+      this.testClient = WebSocketService.connect(`/test/${this.id}`)
+      this.testClient.onmessage =  message=>{
+        console.log(message)
+      }
+    }
   },
   created() {
     this.getTest()
+    this.listenAnswerRecordChange()
+  },
+  unmounted() {
+    // this.testClient.close()
   }
 
 }

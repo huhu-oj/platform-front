@@ -11,7 +11,7 @@
                       placeholder="账号"></el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input show-password v-model="form.password"
+            <el-input show-password v-model="form.password" clearable
                     placeholder="密码"></el-input>
           </el-form-item>
           <el-form-item prop="code">
