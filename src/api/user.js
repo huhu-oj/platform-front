@@ -15,3 +15,12 @@ export function getByUsername(username) {
         }
     })
 }
+export function getByIds(userIds) {
+    let params = new URLSearchParams()
+    userIds &&params.append('userIds',userIds)
+    return new request({
+        url: '/api/user/ids',
+        method: 'get',
+        params
+    })
+}

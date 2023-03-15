@@ -1,13 +1,16 @@
 <template>
   <!--单场测验统计-->
   <v-chart :option="testData" class="chart"/>
+<!--  我的已结束的测验对比-->
+
 </template>
 
 <script>
 import {getForTeacher as getTest} from '@/api/test'
 import VChart from "vue-echarts";
-import {uniqueObjArray} from "@/utils";
+import {checkTestStatus, uniqueArr, uniqueObjArray} from "@/utils";
 import WebSocketService from "@/utils/websocket";
+import {getByIds} from "@/api/user";
 export default {
   //如果有给测验id，则显示单场测验的统计，不然实现测验对比
   name: "TestAnalysis",
@@ -34,15 +37,40 @@ export default {
     },
     testData() {
       if (!this.answerRecords) return
+      if (!this.users) return
       //分组answerRecord
+      const ARGroup = this.answerRecords.groupBy(ar => ar.userId)
+      const userDeptMap = new Map()
+      this.users.forEach(u=>{
+        userDeptMap.set(u.id+'',u.deptId)
+      })
+      // console.log(userDeptMap)
+      const deptIds = uniqueArr(this.users.map(u=>u.deptId))
+      // console.log(deptIds)
       const result = []
-      const ARGroup = this.answerRecords.groupBy(ar => ar.userId);
+      for (let i = 0; i < deptIds.length; i++) {
+        result.push([])
+      }
+      // console.log(result)
+      //按部门分类
       Object.entries(ARGroup).forEach(([userId, ar]) => {
         const averageCompletion = this.averageCompletion(ar);
         const averageCorrect = this.averageCorrect(ar);
-        result.push([averageCompletion, averageCorrect])
+        //获取对应部门
+        const deptId = userDeptMap.get(userId);
+        result[deptIds.indexOf(deptId)].push([averageCompletion, averageCorrect])
       })
       console.log(result)
+
+      //组装序列
+      const series = []
+      for (let i = 0; i < deptIds.length; i++) {
+        series.push({
+          symbolSize: 10,
+          data: result[i],
+          type: 'scatter'
+        })
+      }
       return {
         title: [
           {
@@ -159,11 +187,7 @@ export default {
           },
           splitNumber: 10
         },
-        series: [{
-          symbolSize: 10,
-          data: result,
-          type: 'scatter'
-        }],
+        series: series,
         grid: {
           left: '5%',
           right: '5%',
@@ -174,12 +198,13 @@ export default {
           borderColor: '#ccc'
         }
       }
-    }
+    },
   },
   data() {
     return {
       test: {},
-      testClient: null
+      testClient: null,
+      users: null
     }
   },
 
@@ -187,6 +212,17 @@ export default {
     getTest() {
       getTest(this.id).then(data => {
         this.test = data.content[0]
+        this.test.answerRecords = this.test.answerRecords.filter(ar=>{
+          return new Date(ar.createTime)<new Date(this.test.endTime)
+        })
+        //获取用户
+        getByIds(uniqueArr(this.test.answerRecords.map(ar=>ar.userId))).then(data=>{
+          this.users = data
+        })
+        if (checkTestStatus(this.test) !== 0) {
+          return
+        }
+        this.listenAnswerRecordChange()
       })
     },
     averageCompletion(answerRecords) {
@@ -204,18 +240,18 @@ export default {
       return correctProblemCount / problemCount * 100
     },
     listenAnswerRecordChange() {
+
       this.testClient = WebSocketService.connect(`/test/${this.id}`)
       this.testClient.onmessage =  message=>{
-        console.log(message)
+        this.getTest()
       }
     }
   },
   created() {
     this.getTest()
-    this.listenAnswerRecordChange()
   },
-  unmounted() {
-    // this.testClient.close()
+  beforeUnmount() {
+    this.testClient.close()
   }
 
 }

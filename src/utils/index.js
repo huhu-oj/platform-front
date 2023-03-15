@@ -390,18 +390,18 @@ export function uniqueObjArray(arr, uniId){
   const res = new Map();
   return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
 }
-   export function checkTestStatus(test) {
-      if (!test.enabled) {
-        return 1
-      }
-      const currentTime = Date.parse(new Date())
-      const startTime = Date.parse(test.startTime)
-      const endTime = Date.parse(test.endTime)
-      if (currentTime < startTime) {
-        return -1
-      } else if (currentTime > startTime && currentTime < endTime) {
-        return 0
-      } else {
-        return 1
-      }
-    }
+export function checkTestStatus(test) {
+  if (!test.enabled) {
+    return 1
+  }
+  const currentTime = Date.parse(new Date())
+  const startTime = Date.parse(test.startTime)
+  const endTime = Date.parse(test.endTime)
+  if (currentTime < startTime) {
+    return -1
+  } else if (currentTime > startTime && currentTime < endTime) {
+    return 0
+  } else {
+    return 1
+  }
+}
