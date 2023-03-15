@@ -1,4 +1,12 @@
 <template>
+  <el-select v-model="testId" v-if="!this.id" @change="getTest">
+    <el-option
+      v-for="item in tests"
+      :key="item.id"
+      :label="item.title"
+      :value="item.id"
+    />
+  </el-select>
   <!--单场测验统计-->
   <v-chart :option="testData" class="chart"/>
 <!--  我的已结束的测验对比-->
@@ -203,20 +211,37 @@ export default {
   data() {
     return {
       test: {},
+      testId: null,
+      tests: [],
       testClient: null,
       users: null
     }
   },
 
   methods: {
+    getTests() {
+      getTest().then(data=>{
+        this.tests = data.content
+        this.tests = this.tests.filter(test=>checkTestStatus(test) === 1)
+      })
+    },
     getTest() {
-      getTest(this.id).then(data => {
+      let testId = this.id
+      if (!this.id) {
+        if (!this.testId) return
+        testId = this.testId
+      }
+      getTest(testId).then(data => {
         this.test = data.content[0]
         this.test.answerRecords = this.test.answerRecords.filter(ar=>{
           return new Date(ar.createTime)<new Date(this.test.endTime)
         })
         //获取用户
-        getByIds(uniqueArr(this.test.answerRecords.map(ar=>ar.userId))).then(data=>{
+        const userIds = uniqueArr(this.test.answerRecords.map(ar=>ar.userId))
+        if (userIds.length === 0) {
+          return
+        }
+        getByIds(userIds).then(data=>{
           this.users = data
         })
         if (checkTestStatus(this.test) !== 0) {
@@ -249,8 +274,9 @@ export default {
   },
   created() {
     this.getTest()
+    this.getTests()
   },
-  beforeUnmount() {
+  unmounted() {
     this.testClient.close()
   }
 
