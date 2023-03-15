@@ -7,10 +7,8 @@
       <!--      <div>{{ test.title }}</div>-->
       <el-statistic title="测验分数" :value="testResult.score"/>
       <el-row justify="center">
-        <el-col :span="12">
+        <el-col :span="24">
           <v-chart :option="option" autosize class="chart"/>
-        </el-col>
-        <el-col :span="12">
           <v-chart :option="option1" autosize class="chart"/>
         </el-col>
       </el-row>
@@ -124,7 +122,7 @@ export default {
       const knowledgeNames = uniqueArr(problems.map(p => p.problem.problemKnowledges || [])
           .reduce((a, b) => a.concat(b)).map(k => k && k.knowledge.name))
       //回答正确的题目
-      const rightProblemTitles = this.problems.map(p => p.title)
+      const rightProblemTitles = this.answerRecords.filter(ar=>ar.executeResult.id === 1).map(ar=>ar.problem.title)
       //全部题目通过的情况
       //遍历知识点获得权重累加和
       const data1 = knowledgeNames.map(name => {
@@ -142,9 +140,13 @@ export default {
         } catch (e) {
           // console.log(e)
         }
+        let percent = Math.floor(rightWeight.reduce((a, b) => a + b, 0) / weight.reduce((a, b) => a + b, 0) *10000)/100
+        if (!isFinite(percent)) {
+          percent = 0
+        }
         return {
           knowledgeName: name,
-          '知识点掌握程度': (Math.floor(weight.reduce((a, b) => a + b, 0) / rightWeight.reduce((a, b) => a + b, 0) * 10000) / 100)
+          '知识点掌握程度': percent
         }
       })
 
@@ -161,6 +163,9 @@ export default {
 
         series: [{
           type: 'bar',
+          label: {
+            show: true
+          },
         }],
         // 设置 x 轴和 y 轴的配置
         xAxis: {
