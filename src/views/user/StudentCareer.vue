@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {getRecords} from "@/api/test";
+import {getRecords,getRecordsForTeacher} from "@/api/test";
 import {uniqueObjArray, parseTime} from "@/utils";
 
 import VChart from "vue-echarts";
@@ -32,6 +32,7 @@ export default {
   components: {
     VChart
   },
+  props: ['studentId'],
   computed: {
     testCount() {
       return this.testRecords.length
@@ -150,6 +151,12 @@ export default {
       testRecords: [],
     }
   },
+  watch: {
+    studentId(newVal) {
+      console.log(newVal)
+      this.getStudentRecords()
+    }
+  },
   methods: {
     getRecords() {
       getRecords().then(data=>{
@@ -158,10 +165,23 @@ export default {
         })
         this.testRecords = data
       })
+    },
+    getStudentRecords() {
+      getRecordsForTeacher(this.studentId).then(data=>{
+        data.forEach(d=>{
+          d.test = JSON.parse(d.testJsonStr)
+        })
+        this.testRecords = data
+      })
     }
   },
   created() {
-    this.getRecords()
+
+    if (!this.studentId) {
+      this.getRecords()
+    } else {
+      this.getStudentRecords()
+    }
   }
 }
 </script>

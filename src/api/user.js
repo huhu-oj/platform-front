@@ -6,3 +6,12 @@ export function get() {
         method: 'get',
     })
 }
+export function getByUsername(username) {
+    return request({
+        url: '/api/user/name',
+        method: 'get',
+        params: {
+            username
+        }
+    })
+}

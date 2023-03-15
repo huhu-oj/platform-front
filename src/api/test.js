@@ -19,6 +19,16 @@ export function getForTeacher(testId) {
         }
     })
 }
+
+export function getRecordsForTeacher(studentId) {
+    return request({
+        url: '/api/test/record/student',
+        method: 'get',
+        params: {
+            studentId
+        }
+    })
+}
 export function save(data) {
     return request({
         url: '/api/test',
