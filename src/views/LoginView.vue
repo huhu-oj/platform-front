@@ -90,8 +90,6 @@ export default {
           return
         }
         this.loading = true
-        //加密密码
-        this.form.password = encrypt(this.form.password)
         this.$store.dispatch('Login', this.form).then(() => {
           this.loading = false
           this.$router.push({ path: this.$route.query.redirect || '/' })

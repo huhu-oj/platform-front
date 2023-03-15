@@ -215,7 +215,7 @@ import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords} from '@/api/answerRecord'
 import {get as getLabelList} from '@/api/label'
 import {judge, test} from "@/api/judge";
-import {ElNotification} from "element-plus";
+import {ElMessageBox, ElNotification} from "element-plus";
 import {debounce, checkTestStatus} from "@/utils";
 export default {
   components: {
@@ -489,8 +489,12 @@ export default {
     checkSubmitTest() {
       getRecord(this.test.id).then(data=>{
         if (data) {
-          ElNotification.warning("你已经完成过作答")
-          this.$router.back(1)
+          ElMessageBox.alert('你已经完成过作答', '警告', {
+            confirmButtonText: '确认退出',
+            callback: (action) => {
+              this.$router.back(1)
+            },
+          })
         }
       })
     },

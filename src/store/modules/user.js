@@ -1,6 +1,9 @@
 import { login, getInfo, logout } from '@/api/auth'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
+import {encrypt} from "@/utils/rsaEncrypt";
+import {deepClone} from "@/utils";
+
 const user = {
   state: {
     token: getToken(),
@@ -27,7 +30,10 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      return login(userInfo).then(res => {
+      const data = deepClone(userInfo)
+      //加密密码
+      data.password = encrypt(data.password)
+      return login(data).then(res => {
         setToken(res.token)
         commit('SET_TOKEN', res.token)
         setUserInfo(res.user, commit)

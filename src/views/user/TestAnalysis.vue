@@ -8,7 +8,7 @@
     />
   </el-select>
   <!--单场测验统计-->
-  <v-chart :option="testData" class="chart"/>
+  <v-chart :option="testData" class="chart" autoresize/>
 <!--  我的已结束的测验对比-->
 
 </template>
@@ -69,7 +69,17 @@ export default {
         result[deptIds.indexOf(deptId)].push([averageCompletion, averageCorrect])
       })
       console.log(result)
-
+      //平均完成率和平均正确率
+      const arr = result.reduce((a, b)=>a.concat(b),[]);
+      const averageCompletion = arr.map(val=>val[0]).reduce((a,b)=>a+b,0) / arr.length
+      const averageCorrect = arr.map(val=>val[1]).reduce((a,b)=>a+b,0) / arr.length
+      result.forEach(row=>{
+        row.forEach(cell=>{
+          cell[0] = cell[0]-averageCompletion
+          cell[1] = cell[1]-averageCorrect
+        })
+      })
+      console.log(result)
       //组装序列
       const series = []
       for (let i = 0; i < deptIds.length; i++) {
@@ -151,7 +161,7 @@ export default {
           name: '完成率',
           nameLocation: 'center',
           nameGap: 25,
-          min: 0,
+          min: -100,
           max: 100,
           splitLine: {show: false}, // 隐藏网格线
           axisLine: {
@@ -175,7 +185,7 @@ export default {
           name: '正确率',
           nameLocation: 'center',
           nameGap: 25,
-          min: 0,
+          min: -100,
           max: 100,
           splitLine: {show: false},
           axisLine: {
@@ -277,6 +287,7 @@ export default {
     this.getTests()
   },
   unmounted() {
+    if (!this.testClient) return
     this.testClient.close()
   }
 

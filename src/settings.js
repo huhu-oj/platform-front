@@ -30,7 +30,7 @@ module.exports = {
   /**
    * 底部文字，支持html语法
    */
-  footerTxt: '© 2023 Nie WeiLiang <a href="http://www.apache.org/licenses/LICENSE-3.0" target="_blank">Apache License 3.0</a>',
+  footerTxt: '© 2023 longjiang <a href="http://www.apache.org/licenses/LICENSE-3.0" target="_blank">Apache License 3.0</a>',
   /**
    * 备案号
    */

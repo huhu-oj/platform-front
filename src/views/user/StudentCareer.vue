@@ -125,7 +125,7 @@ export default {
         // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
 
         series: [{
-          type: 'line',
+          type: 'bar',
           stack: 'total',
           label: {
             show: true
