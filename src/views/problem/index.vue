@@ -215,6 +215,7 @@ import {get as getSolutions,save as saveSolution} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
 import {get as getAnswerRecords, update as updateNote} from '@/api/answerRecord'
 import {get as getLabelList} from '@/api/label'
+import {getUseLanguage} from "@/api/user";
 import {judge, test} from "@/api/judge";
 import {ElMessageBox, ElNotification} from "element-plus";
 import {debounce, checkTestStatus} from "@/utils";
@@ -413,7 +414,27 @@ export default {
       }
       getAnswerRecords(this.problem.id,null,outOfDate).then(answerRecordData=>{
         this.answerRecords = answerRecordData.content
+        //用户常用语言
+        this.getUserUseLanguage(this.answerRecords)
       })
+    },
+    getUserUseLanguage(answerRecords) {
+      getUseLanguage().then(data=>{
+        this.languageId = data
+      })
+      // if (!answerRecords || answerRecords.length === 0) return
+      // const languageMap = answerRecords.groupBy(ar=>ar.language.id)
+      // console.log(languageMap)
+      // let max = 0
+      // let maxId
+      // for(const key in languageMap) {
+      //   console.log(languageMap[key].length)
+      //   if (languageMap[key].length > max) {
+      //     max = languageMap[key].length
+      //     maxId = key
+      //   }
+      // }
+      // this.languageId = parseInt(maxId)
     },
     showSolution(item) {
       this.solutionDetail = item
@@ -466,6 +487,7 @@ export default {
             this.getProblem(problemId=>{
               getAnswerRecords(problemId).then(answerRecordData=>{
                 this.answerRecords = answerRecordData.content
+                this.getUserUseLanguage(this.answerRecords)
               })
             })
           })
@@ -485,6 +507,7 @@ export default {
           this.getProblem(problemId=>{
             getAnswerRecords(problemId,null,outOfDate).then(answerRecordData=>{
               this.answerRecords = answerRecordData.content
+              this.getUserUseLanguage(this.answerRecords)
             })
           })
         })

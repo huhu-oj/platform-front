@@ -24,3 +24,9 @@ export function getByIds(userIds) {
         params
     })
 }
+export function getUseLanguage() {
+    return request({
+        url: '/api/user/language',
+        method: 'get',
+    })
+}
