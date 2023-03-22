@@ -31,3 +31,10 @@ export function getAll(problemId,answerRecordId,testId,labelIds) {
         params
     })
 }
+export function update(data) {
+    return request({
+        url: '/api/answerRecord',
+        method: 'put',
+        data
+    })
+}

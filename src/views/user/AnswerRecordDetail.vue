@@ -44,7 +44,9 @@
           </div>
           <div style="flex-grow: 1"></div>
           <div>
-            <span>{{ answerRecord.note }}</span>
+            <el-link v-if="!answerRecord.note && !answerRecord.noteEditVisible" @click="answerRecord.noteEditVisible = true">添加备注</el-link>
+            <el-input v-else-if="answerRecord.noteEditVisible" v-model="answerRecord.note" @blur="changeNote(answerRecord)"/>
+            <span v-else @click="answerRecord.noteEditVisible = true">{{answerRecord.note}}</span>
             <el-button type="success" @click="toProblem">编辑代码</el-button>
           </div>
         </div>
@@ -62,7 +64,7 @@
 
 <script>
 import navbar from "@/components/navbar/index.vue";
-import {get as getAnswerRecord} from '@/api/answerRecord'
+import {get as getAnswerRecord, update as updateNote} from '@/api/answerRecord'
 import Codemirror from 'codemirror-editor-vue3';
 // 编辑器代码格式
 import 'codemirror/mode/javascript/javascript.js';
@@ -105,6 +107,11 @@ export default {
     }
   },
   methods: {
+    changeNote(answerRecord) {
+      updateNote(answerRecord).then(_=>{
+        answerRecord.noteEditVisible = false
+      })
+    },
     getAnswerRecord() {
       getAnswerRecord(null, this.id).then(data=>{
         this.answerRecord = data.content[0]

@@ -54,10 +54,11 @@
                     <el-link type="primary" :href="`/answer_record_detail/${scope.row.id}`">{{scope.row.executeResult.name }} </el-link>
                   </template>
                 </el-table-column>
-                <el-table-column prop="note" label="备注">
+                <el-table-column prop="note" label="备注" show-overflow-tooltip>
                   <template #default="scope">
-                    <span v-if="!scope.row.note">添加备注</span>
-                    <span v-else>{{scope.row.note}}</span>
+                    <el-link v-if="!scope.row.note && !scope.row.noteEditVisible" @click="scope.row.noteEditVisible = true">添加备注</el-link>
+                    <el-input v-else-if="scope.row.noteEditVisible" v-model="scope.row.note" @blur="changeNote(scope.row)"/>
+                    <span v-else @dblclick="scope.row.noteEditVisible = true">{{scope.row.note}}</span>
                   </template>
                 </el-table-column>
               </el-table>
@@ -80,8 +81,8 @@
               />
             </el-select>
             <div style="display: flex;flex-grow: 1"></div>
-            <el-button>设置</el-button>
-            <el-button>全屏</el-button>
+<!--            <el-button>设置</el-button>-->
+<!--            <el-button>全屏</el-button>-->
           </div>
           <div >
               <codemirror
@@ -212,7 +213,7 @@ import {get as getLanguageList} from '@/api/language'
 import {get as getTest,saveRecord,getRecord} from '@/api/test'
 import {get as getSolutions,save as saveSolution} from '@/api/solution'
 import {get as getProblemById} from '@/api/problem'
-import {get as getAnswerRecords} from '@/api/answerRecord'
+import {get as getAnswerRecords, update as updateNote} from '@/api/answerRecord'
 import {get as getLabelList} from '@/api/label'
 import {judge, test} from "@/api/judge";
 import {ElMessageBox, ElNotification} from "element-plus";
@@ -262,7 +263,8 @@ export default {
         testCase: '',
         error: null,
         log: null,
-      }
+      },
+      noteEditVisible: false,
     }
   },
   computed: {
@@ -300,6 +302,11 @@ export default {
     }
   },
   methods: {
+    changeNote(answerRecord) {
+      updateNote(answerRecord).then(_=>{
+        answerRecord.noteEditVisible = false
+      })
+    },
     changeLanguageTemplate(languageId) {
       this.code = this.languageList.filter(language=>language.id === languageId)[0].compileStatement
     },
