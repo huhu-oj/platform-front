@@ -80,7 +80,7 @@ export default {
         series: [
           {
             datasetIndex: 0,
-            name: '题目',
+            name: '标签',
             type: 'pie',
             radius: ['75%','95%'],
             labelLine: {
@@ -104,7 +104,7 @@ export default {
           },
           {
             datasetIndex: 2,
-            name: '标签',
+            name: '判题结果',
             type: 'pie',
             radius: ['25%','49%'],
             labelLine: {
@@ -116,7 +116,7 @@ export default {
           },
           {
             datasetIndex: 3,
-            name: '判题结果',
+            name: '题目',
             type: 'pie',
             radius: [0,'24%'],
             labelLine: {
@@ -188,10 +188,10 @@ export default {
           })
         }
         //统计
-        this.answerRecordStat.dataset[0].source = data0
+        this.answerRecordStat.dataset[0].source = data2
         this.answerRecordStat.dataset[1].source = data1
-        this.answerRecordStat.dataset[2].source = data2
-        this.answerRecordStat.dataset[3].source = data3
+        this.answerRecordStat.dataset[2].source = data3
+        this.answerRecordStat.dataset[3].source = data0
       })
     }
   },

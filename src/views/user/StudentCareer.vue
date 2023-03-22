@@ -126,7 +126,6 @@ export default {
 
         series: [{
           type: 'bar',
-          stack: 'total',
           label: {
             show: true
           },
@@ -135,7 +134,6 @@ export default {
           },
         }, {
           type: 'line',
-          stack: 'total',
           label: {
             show: true
           },
