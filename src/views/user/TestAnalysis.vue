@@ -86,7 +86,28 @@ export default {
         series.push({
           symbolSize: 10,
           data: result[i],
-          type: 'scatter'
+          type: 'scatter',
+          markArea: {
+            silent: true,
+            itemStyle: {
+              color: 'transparent',
+              borderWidth: 1,
+              borderType: 'dashed'
+            },
+            data: [
+              [
+                {
+                  // name: '1班',
+                  xAxis: 'min',
+                  yAxis: 'min'
+                },
+                {
+                  xAxis: 'max',
+                  yAxis: 'max'
+                },
+              ]
+            ]
+          },
         })
       }
       return {
