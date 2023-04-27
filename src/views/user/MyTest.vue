@@ -70,16 +70,16 @@
         </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" :disabled="checkTestStatus(scope.row) !== -1" @click="updateTest(scope.row)">修改</el-button>
+            <el-button size="small" :disabled="checkTestStatus(scope.row) !== -1" @click.stop="updateTest(scope.row)">修改</el-button>
              <el-popconfirm title="确认删除" @confirm="delTest(scope.row)">
                <template #reference>
                  <el-button v-if="checkTestStatus(scope.row) === -1" size="small" type="danger" >删除</el-button>
                  <el-button v-if="checkTestStatus(scope.row) === 1" :disabled="checkTestStatus(scope.row) === 1" size="small" type="danger" >删除</el-button>
                </template>
              </el-popconfirm>
-            <el-popconfirm title="确认结束当前测验" @confirm="endTest(scope.row)">
+            <el-popconfirm title="确认结束当前测验" @confirm.stop="endTest(scope.row)">
               <template #reference>
-                <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" >结束</el-button>
+                <el-button v-if="checkTestStatus(scope.row) === 0" size="small" type="danger" @click.stop>结束</el-button>
               </template>
             </el-popconfirm>
           </template>
